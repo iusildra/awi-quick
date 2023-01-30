@@ -1,0 +1,18 @@
+version: "3.8"
+
+services:
+  awi-quick-db:
+    container_name: awi-quick-db
+    image: postgres:15.0-bullseye
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./sql:/home
+      - awi-quick-db-vol:/var/lib/postgresql/data
+    restart: unless-stopped
+
+volumes:
+  awi-quick-db-vol:
