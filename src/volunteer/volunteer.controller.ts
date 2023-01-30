@@ -8,19 +8,19 @@ import {
   Param,
 } from '@nestjs/common';
 import { VolunteerService } from './volunteer.service';
-import { VolunteerDTO } from '../dto/volunteer.dto';
+import { CreateVolunteerDto, UpdateVolunteerDto } from './dto';
 
 @Controller('volunteers')
 export class VolunteerController {
   constructor(private volunteerService: VolunteerService) {}
 
   @Get()
-  findAllVolunteers() {
+  findAllVolunteer() {
     return this.volunteerService.findAll();
   }
 
   @Post()
-  createVolunteer(@Body() data: VolunteerDTO) {
+  createVolunteer(@Body() data: CreateVolunteerDto) {
     return this.volunteerService.create(data);
   }
 
@@ -30,7 +30,7 @@ export class VolunteerController {
   }
 
   @Put(':id')
-  updateVolunteer(@Param('id') id: string, @Body() data: VolunteerDTO) {
+  updateVolunteer(@Param('id') id: string, @Body() data: UpdateVolunteerDto) {
     return this.volunteerService.update(id, data);
   }
 

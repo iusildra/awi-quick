@@ -3,8 +3,7 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { VolunteerModule } from './volunteer/volunteer.module';
 import { SequelizeModule } from '@nestjs/sequelize';
-import { VolunteerModel } from './model';
-import { GameModule } from './game/game.module';
+import { Volunteer } from './volunteer/entities/volunteer.entity';
 
 @Module({
   imports: [
@@ -16,7 +15,7 @@ import { GameModule } from './game/game.module';
       username: process.env.TOWER_DB_USERNAME || 'postgres',
       password: process.env.TOWER_DB_PASSWORD || 'postgres',
       database: process.env.TOWER_DB_DATABASE || 'postgres',
-      models: [VolunteerModel],
+      models: [Volunteer],
       autoLoadModels: true,
       logging: process.env.NODE_ENV === 'PRODUCTION' ? false : Logger.debug,
       pool: {
@@ -25,7 +24,7 @@ import { GameModule } from './game/game.module';
         idle: 5000,
       },
     }),
-    GameModule,
+    VolunteerModule,
   ],
   controllers: [AppController],
   providers: [AppService],

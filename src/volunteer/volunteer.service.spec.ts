@@ -2,7 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { VolunteerService } from './volunteer.service';
 import { VolunteerDTO } from '../dto/volunteer.dto';
 import { getModelToken } from '@nestjs/sequelize';
-import { VolunteerModel } from '../model';
+import { Volunteer } from '../model';
 import { Sequelize } from 'sequelize';
 import { Logger } from '@nestjs/common';
 
@@ -37,7 +37,7 @@ describe('VolunteerService', () => {
       providers: [
         VolunteerService,
         {
-          provide: getModelToken(VolunteerModel),
+          provide: getModelToken(Volunteer),
           useValue: jest.fn(),
         },
       ],

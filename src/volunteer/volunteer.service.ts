@@ -1,13 +1,13 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
-import { VolunteerDTO } from '../dto/volunteer.dto';
-import { VolunteerModel } from '../model/volunteer.model';
+import { CreateVolunteerDto, UpdateVolunteerDto } from './dto';
+import { Volunteer } from './entities/volunteer.entity';
 
 @Injectable()
 export class VolunteerService {
   constructor(
-    @InjectModel(VolunteerModel)
-    private readonly volunteerModel: typeof VolunteerModel,
+    @InjectModel(Volunteer)
+    private readonly volunteerModel: typeof Volunteer,
   ) {}
 
   async findAll() {
@@ -19,7 +19,7 @@ export class VolunteerService {
     }
   }
 
-  async create(volunteerDto: VolunteerDTO) {
+  async create(volunteerDto: CreateVolunteerDto) {
     Logger.debug(volunteerDto);
     try {
       Logger.debug('tes');
@@ -40,7 +40,7 @@ export class VolunteerService {
     }
   }
 
-  async update(id: string, data: VolunteerDTO) {
+  async update(id: string, data: UpdateVolunteerDto) {
     try {
       const volunteer = await this.volunteerModel.update(data, {
         where: { id },

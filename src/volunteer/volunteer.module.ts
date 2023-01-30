@@ -2,10 +2,10 @@ import { Module } from '@nestjs/common';
 import { VolunteerController } from './volunteer.controller';
 import { VolunteerService } from './volunteer.service';
 import { SequelizeModule } from '@nestjs/sequelize';
-import { VolunteerModel } from 'src/model/volunteer.model';
+import { Volunteer } from './entities/volunteer.entity';
 
 @Module({
-  imports: [SequelizeModule.forFeature([VolunteerModel])],
+  imports: [SequelizeModule.forFeature([Volunteer])],
   controllers: [VolunteerController],
   providers: [VolunteerService],
 })
