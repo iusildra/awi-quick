@@ -5,6 +5,7 @@ import { VolunteerModule } from './volunteer/volunteer.module';
 import { SequelizeModule } from '@nestjs/sequelize';
 import { Volunteer } from './volunteer/entities/volunteer.entity';
 import { GameModule } from './game/game.module';
+import { ZoneModule } from './zone/zone.module';
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { GameModule } from './game/game.module';
       },
     }),
     GameModule,
+    ZoneModule,
   ],
   controllers: [AppController],
   providers: [AppService],
