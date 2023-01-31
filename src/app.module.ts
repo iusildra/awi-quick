@@ -6,10 +6,10 @@ import { SequelizeModule } from '@nestjs/sequelize';
 import { Volunteer } from './volunteer/entities/volunteer.entity';
 import { GameModule } from './game/game.module';
 import { ZoneModule } from './zone/zone.module';
+import { TimeslotModule } from './timeslot/timeslot.module';
 
 @Module({
   imports: [
-    VolunteerModule,
     SequelizeModule.forRoot({
       dialect: 'postgres',
       host: process.env.TOWER_DB_HOST || 'localhost',
@@ -26,8 +26,10 @@ import { ZoneModule } from './zone/zone.module';
         idle: 5000,
       },
     }),
+    VolunteerModule,
     GameModule,
     ZoneModule,
+    TimeslotModule,
   ],
   controllers: [AppController],
   providers: [AppService],
