@@ -22,9 +22,7 @@ export class VolunteerService {
   async create(volunteerDto: CreateVolunteerDto) {
     Logger.debug(volunteerDto);
     try {
-      Logger.debug('tes');
       const volunteer = await this.volunteerModel.create(volunteerDto);
-      Logger.debug(volunteer);
       return volunteer;
     } catch (err) {
       Logger.error(err);

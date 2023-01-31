@@ -15,27 +15,27 @@ export class VolunteerController {
   constructor(private volunteerService: VolunteerService) {}
 
   @Get()
-  findAllVolunteer() {
+  findAll() {
     return this.volunteerService.findAll();
   }
 
   @Post()
-  createVolunteer(@Body() data: CreateVolunteerDto) {
+  create(@Body() data: CreateVolunteerDto) {
     return this.volunteerService.create(data);
   }
 
   @Get(':id')
-  showVolunteer(@Param('id') id: string) {
+  show(@Param('id') id: string) {
     return this.volunteerService.read(id);
   }
 
   @Put(':id')
-  updateVolunteer(@Param('id') id: string, @Body() data: UpdateVolunteerDto) {
+  update(@Param('id') id: string, @Body() data: UpdateVolunteerDto) {
     return this.volunteerService.update(id, data);
   }
 
   @Delete(':id')
-  destroyVolunteer(@Param('id') id: string) {
+  destroy(@Param('id') id: string) {
     return this.volunteerService.destroy(id);
   }
 }
