@@ -4,12 +4,17 @@ import { UpdateZoneDto } from './dto/update-zone.dto';
 import { Zone } from './entities/zone.entity';
 import { InjectModel } from '@nestjs/sequelize';
 import { Op } from 'sequelize';
+import { AssignGameDto } from './dto/assign-game.dto';
+import { GameZone } from './entities/game-zone-relation.entity';
+import { UnassignGameDto } from './dto/unassign-game.dto';
 
 @Injectable()
 export class ZoneService {
   constructor(
     @InjectModel(Zone)
     private readonly zoneModel: typeof Zone,
+    @InjectModel(GameZone)
+    private readonly gameZoneModel: typeof GameZone,
   ) {}
 
   async create(createZoneDto: CreateZoneDto) {
@@ -41,6 +46,52 @@ export class ZoneService {
         name: createZoneDto.name,
       });
       return zone;
+    } catch (err) {
+      Logger.error(err);
+    }
+  }
+
+  zipGameWithZone(
+    zoneId: number,
+    zoneNumber: number,
+    gameIds: AssignGameDto | UnassignGameDto,
+  ) {
+    return gameIds.ids.map((gameId) => {
+      return {
+        zoneId,
+        zoneNumber,
+        gameId,
+      };
+    });
+  }
+
+  async assignGames(
+    zoneId: number,
+    zoneNumber: number,
+    assignGameDto: AssignGameDto,
+  ) {
+    try {
+      const zones = await this.gameZoneModel.bulkCreate(
+        this.zipGameWithZone(zoneId, zoneNumber, assignGameDto),
+      );
+      return zones.length;
+    } catch (err) {
+      Logger.error(err);
+    }
+  }
+
+  async unassignGames(
+    zoneId: number,
+    zoneNumber: number,
+    unassignGameDto: UnassignGameDto,
+  ) {
+    try {
+      const zones = await this.gameZoneModel.destroy({
+        where: {
+          [Op.or]: this.zipGameWithZone(zoneId, zoneNumber, unassignGameDto),
+        },
+      });
+      return zones;
     } catch (err) {
       Logger.error(err);
     }

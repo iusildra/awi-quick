@@ -7,36 +7,36 @@
 --   PRIMARY KEY (id, num)
 -- );
 
-INSERT INTO zones VALUES
+INSERT INTO zones(num, name) VALUES
   -- Esplanade-Gauche --
-  (1, 1, 'Esplanade-Gauche', NOW(), NOW()),
-  (1, 2, 'Esplanade-Gauche', NOW(), NOW()),
-  (1, 3, 'Esplanade-Gauche', NOW(), NOW()),
+  (1, 'Esplanade-Gauche'),
+  (2, 'Esplanade-Gauche'),
+  (3, 'Esplanade-Gauche'),
   -- Esplanade-Centre --
-  (2, 1, 'Esplanade-Centre', NOW(), NOW()),
-  (2, 2, 'Esplanade-Centre', NOW(), NOW()),
-  (2, 3, 'Esplanade-Centre', NOW(), NOW()),
-  (2, 4, 'Esplanade-Centre', NOW(), NOW()),
-  (2, 5, 'Esplanade-Centre', NOW(), NOW()),
+  (1, 'Esplanade-Centre'),
+  (2, 'Esplanade-Centre'),
+  (3, 'Esplanade-Centre'),
+  (4, 'Esplanade-Centre'),
+  (5, 'Esplanade-Centre'),
   -- Esplanade-Droite --
-  (3, 1, 'Esplanade-Droite', NOW(), NOW()),
-  (3, 2, 'Esplanade-Droite', NOW(), NOW()),
-  (3, 3, 'Esplanade-Droite', NOW(), NOW()),
-  (3, 4, 'Esplanade-Droite', NOW(), NOW()),
+  (1, 'Esplanade-Droite'),
+  (2, 'Esplanade-Droite'),
+  (3, 'Esplanade-Droite'),
+  (4, 'Esplanade-Droite'),
   -- Esplanade-Accueil --
-  (4, 0, 'Esplanade-Accueil', NOW(), NOW()),
+  (0, 'Esplanade-Accueil'),
   -- Antigone-Buvette --
-  (5, 0, 'Antigone-Buvette', NOW(), NOW()),
+  (0, 'Antigone-Buvette'),
   -- Antigone-Entree --
-  (6, 1, 'Antigone-Entree', NOW(), NOW()),
-  (6, 2, 'Antigone-Entree', NOW(), NOW()),
-  (6, 3, 'Antigone-Entree', NOW(), NOW()),
-  (6, 4, 'Antigone-Entree', NOW(), NOW()),
-  (6, 5, 'Antigone-Entree', NOW(), NOW()),
+  (1, 'Antigone-Entree'),
+  (2, 'Antigone-Entree'),
+  (3, 'Antigone-Entree'),
+  (4, 'Antigone-Entree'),
+  (5, 'Antigone-Entree'),
   -- Antigone-Fond --
-  (7, 1, 'Antigone-Fond', NOW(), NOW()),
-  (7, 2, 'Antigone-Fond', NOW(), NOW()),
+  (1, 'Antigone-Fond'),
+  (2, 'Antigone-Fond'),
   -- Antigone-Proto --
-  (8, 0, 'Antigone-Proto', NOW(), NOW()),
+  (0, 'Antigone-Proto'),
   -- Antigone-Loup-Garous --
-  (9, 0, 'Antigone-Loup-Garous', NOW(), NOW());
+  (0, 'Antigone-Loup-Garous');

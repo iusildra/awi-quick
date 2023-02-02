@@ -10,6 +10,7 @@ import {
 import { ZoneService } from './zone.service';
 import { CreateZoneDto } from './dto/create-zone.dto';
 import { UpdateZoneDto } from './dto/update-zone.dto';
+import { AssignGameDto } from './dto/assign-game.dto';
 
 @Controller('zone')
 export class ZoneController {
@@ -23,6 +24,24 @@ export class ZoneController {
   @Post(':id')
   append(@Param('id') id: number, @Body() createZoneDto: CreateZoneDto) {
     return this.zoneService.append(id, createZoneDto);
+  }
+
+  @Post(':id/:zoneNumber/assign')
+  assignGames(
+    @Param('id') id: number,
+    @Param('zoneNumber') num: number,
+    @Body() assignGameDto: AssignGameDto,
+  ) {
+    return this.zoneService.assignGames(id, num, assignGameDto);
+  }
+
+  @Delete(':id/:zoneNumber/unassign')
+  unassignGames(
+    @Param('id') id: number,
+    @Param('zoneNumber') num: number,
+    @Body() assignGameDto: AssignGameDto,
+  ) {
+    return this.zoneService.unassignGames(id, num, assignGameDto);
   }
 
   @Get()

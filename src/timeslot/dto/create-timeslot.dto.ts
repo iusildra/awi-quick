@@ -1,6 +1,5 @@
 export class CreateTimeslotDto {
-  date: Date;
-  begin: string;
-  end: string;
+  begin: Date;
+  end: Date;
   name: string;
 }

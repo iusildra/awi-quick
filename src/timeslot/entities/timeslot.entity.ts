@@ -2,25 +2,27 @@ import { Table, Column, Model, DataType } from 'sequelize-typescript';
 
 @Table({
   tableName: 'timeslots',
+  timestamps: false,
 })
 export class Timeslot extends Model<Timeslot> {
   @Column({
-    type: DataType.DATEONLY,
+    type: DataType.INTEGER,
+    autoIncrement: true,
     primaryKey: true,
   })
-  date: Date;
+  id: number;
 
   @Column({
-    type: DataType.TIME,
-    primaryKey: true,
-  })
-  begin: string;
-
-  @Column({
-    type: DataType.TIME,
+    type: DataType.DATE,
     allowNull: false,
   })
-  end: string;
+  begin: Date;
+
+  @Column({
+    type: DataType.DATE,
+    allowNull: false,
+  })
+  end: Date;
 
   @Column({
     type: DataType.STRING,

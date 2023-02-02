@@ -25,27 +25,26 @@ export class TimeslotController {
     return this.timeslotService.findAll();
   }
 
-  @Get(':date/')
-  findTimeslots(@Param('date') id: Date) {
+  @Get(':id/')
+  findTimeslots(@Param('id') id: number) {
     return this.timeslotService.findTimeslots(id);
   }
 
-  @Get(':date/:begin')
-  findOne(@Param('date') date: Date, @Param('begin') begin: string) {
-    return this.timeslotService.findOne(date, begin);
+  @Get(':id')
+  findOne(@Param('id') id: number) {
+    return this.timeslotService.findOne(id);
   }
 
-  @Put(':date/:begin')
+  @Put(':id/')
   update(
-    @Param('date') date: Date,
-    @Param('begin') begin: string,
+    @Param('id') id: number,
     @Body() updateTimeslotDto: UpdateTimeslotDto,
   ) {
-    return this.timeslotService.update(date, begin, updateTimeslotDto);
+    return this.timeslotService.update(id, updateTimeslotDto);
   }
 
-  @Delete(':date/:begin')
-  remove(@Param('date') date: Date, @Param('begin') begin: string) {
-    return this.timeslotService.remove(date, begin);
+  @Delete(':id')
+  remove(@Param('id') id: number) {
+    return this.timeslotService.remove(id);
   }
 }

@@ -1,27 +1,29 @@
 import { Table, Column, Model, DataType } from 'sequelize-typescript';
 
 @Table({
-  tableName: 'zones',
+  tableName: 'game_zone',
   timestamps: false,
 })
-export class Zone extends Model<Zone> {
+export class GameZone extends Model<GameZone> {
   @Column({
     type: DataType.INTEGER,
-    autoIncrement: true,
     primaryKey: true,
+    // TODO: add foreign key
   })
-  id: number;
+  zoneId: number;
 
   @Column({
     type: DataType.INTEGER,
-    allowNull: false,
     primaryKey: true,
+    // TODO: add foreign key
   })
-  num: number;
+  zoneNumber: number;
 
   @Column({
-    type: DataType.STRING,
+    type: DataType.UUID,
     allowNull: false,
+    primaryKey: true,
+    // TODO: add foreign key
   })
-  name: string;
+  gameId: string;
 }
