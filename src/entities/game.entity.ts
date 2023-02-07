@@ -1,7 +1,10 @@
 import { Table, Column, Model, DataType } from 'sequelize-typescript';
-import { GameType } from '../dto/create-game.dto';
+import { GameType } from '../game/dto/create-game.dto';
 
-@Table
+@Table({
+  tableName: 'games',
+  timestamps: false,
+})
 export class Game extends Model<Game> {
   @Column({
     type: DataType.UUID,

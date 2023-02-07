@@ -3,10 +3,18 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { VolunteerModule } from './volunteer/volunteer.module';
 import { SequelizeModule } from '@nestjs/sequelize';
-import { Volunteer } from './volunteer/entities/volunteer.entity';
+import {
+  Volunteer,
+  Game,
+  Zone,
+  Timeslot,
+  GameZone,
+  VolunteerAssignment,
+} from './entities';
 import { GameModule } from './game/game.module';
 import { ZoneModule } from './zone/zone.module';
 import { TimeslotModule } from './timeslot/timeslot.module';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -17,7 +25,7 @@ import { TimeslotModule } from './timeslot/timeslot.module';
       username: process.env.TOWER_DB_USERNAME || 'postgres',
       password: process.env.TOWER_DB_PASSWORD || 'postgres',
       database: process.env.TOWER_DB_DATABASE || 'postgres',
-      models: [Volunteer],
+      models: [Volunteer, Game, Zone, Timeslot, GameZone, VolunteerAssignment],
       autoLoadModels: true,
       logging: process.env.NODE_ENV === 'PRODUCTION' ? false : Logger.debug,
       pool: {
@@ -30,6 +38,7 @@ import { TimeslotModule } from './timeslot/timeslot.module';
     GameModule,
     ZoneModule,
     TimeslotModule,
+    AuthModule,
   ],
   controllers: [AppController],
   providers: [AppService],

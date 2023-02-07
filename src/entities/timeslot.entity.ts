@@ -1,9 +1,10 @@
 import { Table, Column, Model, DataType } from 'sequelize-typescript';
 
 @Table({
-  tableName: 'zones',
+  tableName: 'timeslots',
+  timestamps: false,
 })
-export class Zone extends Model<Zone> {
+export class Timeslot extends Model<Timeslot> {
   @Column({
     type: DataType.INTEGER,
     autoIncrement: true,
@@ -12,11 +13,16 @@ export class Zone extends Model<Zone> {
   id: number;
 
   @Column({
-    type: DataType.INTEGER,
+    type: DataType.DATE,
     allowNull: false,
-    primaryKey: true,
   })
-  num: number;
+  begin: Date;
+
+  @Column({
+    type: DataType.DATE,
+    allowNull: false,
+  })
+  end: Date;
 
   @Column({
     type: DataType.STRING,

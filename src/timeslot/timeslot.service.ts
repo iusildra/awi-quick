@@ -1,9 +1,8 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { CreateTimeslotDto } from './dto/create-timeslot.dto';
 import { UpdateTimeslotDto } from './dto/update-timeslot.dto';
 import { InjectModel } from '@nestjs/sequelize';
-import { Timeslot } from './entities/timeslot.entity';
-import { Op } from 'sequelize';
+import { Timeslot } from '../entities/timeslot.entity';
 
 @Injectable()
 export class TimeslotService {
@@ -14,7 +13,6 @@ export class TimeslotService {
 
   async create(createTimeslotDto: CreateTimeslotDto) {
     try {
-      Logger.debug(createTimeslotDto);
       const timeslot = await this.timeslotModel.create(createTimeslotDto);
       return timeslot;
     } catch (err) {
@@ -31,19 +29,19 @@ export class TimeslotService {
     }
   }
 
-  async findTimeslots(date: Date) {
+  async findTimeslots(id: number) {
     try {
-      const timeslots = await this.timeslotModel.findAll({ where: { date } });
+      const timeslots = await this.timeslotModel.findAll({ where: { id } });
       return timeslots;
     } catch (err) {
       console.log(err);
     }
   }
 
-  async findOne(date: Date, begin: string) {
+  async findOne(id: number) {
     try {
       const timeslot = await this.timeslotModel.findOne({
-        where: { [Op.and]: [{ date }, { begin }] },
+        where: { id },
       });
       return timeslot;
     } catch (err) {
@@ -51,16 +49,12 @@ export class TimeslotService {
     }
   }
 
-  async update(
-    date: Date,
-    begin: string,
-    updateTimeslotDto: UpdateTimeslotDto,
-  ) {
+  async update(id: number, updateTimeslotDto: UpdateTimeslotDto) {
     try {
       const timeslotUpdated = await this.timeslotModel.update(
         updateTimeslotDto,
         {
-          where: { [Op.and]: [{ date }, { begin }] },
+          where: { id },
         },
       );
       return timeslotUpdated;
@@ -69,10 +63,10 @@ export class TimeslotService {
     }
   }
 
-  async remove(date: Date, begin: string) {
+  async remove(id: number) {
     try {
       const timeslotDeleted = await this.timeslotModel.destroy({
-        where: { [Op.and]: [{ date }, { begin }] },
+        where: { id },
       });
       return timeslotDeleted;
     } catch (err) {

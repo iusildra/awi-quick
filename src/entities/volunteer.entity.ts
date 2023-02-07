@@ -1,6 +1,9 @@
 import { Table, Column, Model, DataType } from 'sequelize-typescript';
 
-@Table
+@Table({
+  tableName: 'volunteers',
+  timestamps: false,
+})
 export class Volunteer extends Model<Volunteer> {
   @Column({
     type: DataType.UUID,
@@ -8,6 +11,13 @@ export class Volunteer extends Model<Volunteer> {
     primaryKey: true,
   })
   id: string;
+
+  @Column({
+    type: DataType.STRING,
+    allowNull: false,
+    unique: true,
+  })
+  username: string;
 
   @Column({
     type: DataType.STRING,
@@ -27,4 +37,10 @@ export class Volunteer extends Model<Volunteer> {
     unique: true,
   })
   email: string;
+
+  @Column({
+    type: DataType.STRING,
+    allowNull: false,
+  })
+  password: string;
 }

@@ -1,10 +1,13 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { VolunteerService } from './volunteer.service';
-import { VolunteerDTO } from '../dto/volunteer.dto';
+import { CreateVolunteerDto } from './dto/create-volunteer.dto';
 import { getModelToken } from '@nestjs/sequelize';
-import { Volunteer } from '../model';
-import { Sequelize } from 'sequelize';
+import { Volunteer } from '../entities/volunteer.entity';
+import { Sequelize } from 'sequelize-typescript';
 import { Logger } from '@nestjs/common';
+import { Repository } from 'typeorm';
+
+// R.I.P the volunteer service test
 
 describe('VolunteerService', () => {
   let service: VolunteerService;
@@ -26,6 +29,7 @@ describe('VolunteerService', () => {
       },
     });
     await sequelize.sync({ force: true });
+    sequelize.addModels([Volunteer]);
   });
 
   afterAll(async () => {
@@ -38,7 +42,7 @@ describe('VolunteerService', () => {
         VolunteerService,
         {
           provide: getModelToken(Volunteer),
-          useValue: jest.fn(),
+          useClass: Repository,
         },
       ],
     }).compile();
@@ -76,7 +80,7 @@ describe('VolunteerService', () => {
       lastName: 'Doe',
       email: 'john.doe@gmail.com',
     });
-    expect(result).toBeInstanceOf(VolunteerDTO);
+    expect(result).toBeInstanceOf(CreateVolunteerDto);
     expect(service.destroy(result.id)).resolves.toBe(1);
   });
 
@@ -86,9 +90,9 @@ describe('VolunteerService', () => {
       lastName: 'Doe',
       email: 'john.doe@gmail.com',
     });
-    expect(result).toBeInstanceOf(VolunteerDTO);
+    expect(result).toBeInstanceOf(CreateVolunteerDto);
     expect(
-      service.update(result.id, { ...result, firstName: 'Jane' }),
+      service.update(result.id, { ..result, firstName: 'Jane' }),
     ).resolves.toBe(1);
     const updated = await service.read(result.id);
     expect(updated.firstName).toBe('Jane');

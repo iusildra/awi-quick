@@ -8,8 +8,7 @@ import {
   Put,
 } from '@nestjs/common';
 import { GameService } from './game.service';
-import { CreateGameDto } from './dto/create-game.dto';
-import { UpdateGameDto } from './dto/update-game.dto';
+import { CreateGameDto, UpdateGameDto, GameType } from './dto';
 
 @Controller('game')
 export class GameController {
@@ -28,6 +27,29 @@ export class GameController {
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.gameService.findOne(id);
+  }
+
+  @Get('name/:name')
+  findByName(@Param('name') name: string) {
+    return this.gameService.findByName(name);
+  }
+
+  @Get('type/:type')
+  findByType(@Param('type') type: GameType) {
+    return this.gameService.findByType(type);
+  }
+
+  @Get('zone/:zoneId')
+  findByZone(@Param('zoneId') zoneId: number) {
+    return this.gameService.findByZone(zoneId);
+  }
+
+  @Get('zone/:zoneId/:zoneNumber')
+  findByPreciseZone(
+    @Param('zoneId') zoneId: number,
+    @Param('zoneNumber') zoneNumber: number,
+  ) {
+    return this.gameService.findByPreciseZone(zoneId, zoneNumber);
   }
 
   @Put(':id')
