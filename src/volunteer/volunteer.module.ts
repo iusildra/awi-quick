@@ -1,7 +1,7 @@
 import { VolunteerController } from './volunteer.controller';
 import { VolunteerService } from './volunteer.service';
 import { SequelizeModule } from '@nestjs/sequelize';
-import { Volunteer } from './entities/volunteer.entity';
+import { Volunteer } from '../entities/volunteer.entity';
 import {
   MiddlewareConsumer,
   Module,
@@ -9,8 +9,8 @@ import {
   RequestMethod,
 } from '@nestjs/common';
 import { CheckAvailabilityMiddleware } from './middlewares/check-availability.middleware';
-import { VolunteerAssignment } from './entities/volunteer-assignment.entity';
-import { Timeslot } from '../timeslot/entities/timeslot.entity';
+import { VolunteerAssignment } from '../entities/volunteer-assignment.entity';
+import { Timeslot } from '../entities/timeslot.entity';
 
 @Module({
   imports: [
