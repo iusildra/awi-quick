@@ -1,8 +1,8 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { CreateTimeslotDto } from './dto/create-timeslot.dto';
 import { UpdateTimeslotDto } from './dto/update-timeslot.dto';
 import { InjectModel } from '@nestjs/sequelize';
-import { Timeslot } from './entities/timeslot.entity';
+import { Timeslot } from '../entities/timeslot.entity';
 
 @Injectable()
 export class TimeslotService {
@@ -13,7 +13,6 @@ export class TimeslotService {
 
   async create(createTimeslotDto: CreateTimeslotDto) {
     try {
-      Logger.debug(createTimeslotDto);
       const timeslot = await this.timeslotModel.create(createTimeslotDto);
       return timeslot;
     } catch (err) {

@@ -1,8 +1,8 @@
 import { Injectable, NestMiddleware } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { Request, Response, NextFunction } from 'express';
-import { VolunteerAssignment } from '../entities/volunteer-assignment.entity';
-import { Timeslot } from '../../timeslot/entities/timeslot.entity';
+import { VolunteerAssignment } from '../../entities/volunteer-assignment.entity';
+import { Timeslot } from '../../entities/timeslot.entity';
 import { responses } from '../../responses';
 
 @Injectable()

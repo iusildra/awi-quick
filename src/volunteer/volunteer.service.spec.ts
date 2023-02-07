@@ -2,7 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { VolunteerService } from './volunteer.service';
 import { CreateVolunteerDto } from './dto/create-volunteer.dto';
 import { getModelToken } from '@nestjs/sequelize';
-import { Volunteer } from './entities/volunteer.entity';
+import { Volunteer } from '../entities/volunteer.entity';
 import { Sequelize } from 'sequelize-typescript';
 import { Logger } from '@nestjs/common';
 import { Repository } from 'typeorm';
@@ -92,7 +92,7 @@ describe('VolunteerService', () => {
     });
     expect(result).toBeInstanceOf(CreateVolunteerDto);
     expect(
-      service.update(result.id, { ...result, firstName: 'Jane' }),
+      service.update(result.id, { ..result, firstName: 'Jane' }),
     ).resolves.toBe(1);
     const updated = await service.read(result.id);
     expect(updated.firstName).toBe('Jane');

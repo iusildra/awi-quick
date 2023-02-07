@@ -2,7 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { VolunteerController } from './volunteer.controller';
 import { VolunteerService } from './volunteer.service';
 import { SequelizeModule } from '@nestjs/sequelize';
-import { Volunteer } from './entities/volunteer.entity';
+import { Volunteer } from '../entities/volunteer.entity';
 import * as request from 'supertest';
 import { INestApplication, Logger } from '@nestjs/common';
 import { getRepositoryToken } from '@nestjs/typeorm';

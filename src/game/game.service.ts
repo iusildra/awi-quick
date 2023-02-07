@@ -2,9 +2,9 @@ import { Injectable, Logger } from '@nestjs/common';
 import { CreateGameDto, GameType } from './dto/create-game.dto';
 import { UpdateGameDto } from './dto/update-game.dto';
 import { InjectModel } from '@nestjs/sequelize';
-import { Game } from './entities/game.entity';
+import { Game } from '../entities/game.entity';
 import { Op } from 'sequelize';
-import { GameZone } from '../zone/entities/game-zone-relation.entity';
+import { GameZone } from '../entities/game-zone-relation.entity';
 
 @Injectable()
 export class GameService {

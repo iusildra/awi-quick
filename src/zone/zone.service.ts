@@ -1,11 +1,11 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { CreateZoneDto } from './dto/create-zone.dto';
 import { UpdateZoneDto } from './dto/update-zone.dto';
-import { Zone } from './entities/zone.entity';
+import { Zone } from '../entities/zone.entity';
 import { InjectModel } from '@nestjs/sequelize';
 import { Op } from 'sequelize';
 import { AssignGameDto } from './dto/assign-game.dto';
-import { GameZone } from './entities/game-zone-relation.entity';
+import { GameZone } from '../entities/game-zone-relation.entity';
 import { UnassignGameDto } from './dto/unassign-game.dto';
 
 @Injectable()
@@ -19,10 +19,6 @@ export class ZoneService {
 
   async create(createZoneDto: CreateZoneDto) {
     try {
-      Logger.debug({
-        num: 1,
-        ...createZoneDto,
-      });
       const zone = await this.zoneModel.create({
         num: 1,
         ...createZoneDto,

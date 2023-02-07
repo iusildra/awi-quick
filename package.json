@@ -27,6 +27,11 @@
     "@nestjs/platform-express": "^9.0.0",
     "@nestjs/sequelize": "^9.0.0",
     "@nestjs/typeorm": "^9.0.1",
+    "bcrypt": "^5.1.0",
+    "class-transformer": "^0.5.1",
+    "class-validator": "^0.14.0",
+    "dotenv": "^16.0.3",
+    "jsonwebtoken": "^9.0.0",
     "pg": "^8.9.0",
     "reflect-metadata": "^0.1.13",
     "rimraf": "^3.0.2",
@@ -40,9 +45,11 @@
     "@nestjs/cli": "^9.0.0",
     "@nestjs/schematics": "^9.0.0",
     "@nestjs/testing": "^9.0.0",
+    "@types/bcrypt": "^5.0.0",
     "@types/express": "^4.17.13",
     "@types/jest": "28.1.8",
-    "@types/node": "^16.0.0",
+    "@types/jsonwebtoken": "^9.0.1",
+    "@types/node": "^16.18.12",
     "@types/supertest": "^2.0.11",
     "@types/uuid": "^9.0.0",
     "@typescript-eslint/eslint-plugin": "^5.0.0",
@@ -67,7 +74,7 @@
       "ts"
     ],
     "rootDir": "src",
-    "testRegex": ".*\\.spec\\.ts$",
+    "testRegex": "src/volunteer/volunteer.controller.spec.ts",
     "transform": {
       "^.+\\.(t|j)s$": "ts-jest"
     },

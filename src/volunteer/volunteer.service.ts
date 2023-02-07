@@ -6,7 +6,7 @@ import {
   AssignVolunteerDto,
   UnassignVolunteerDto,
 } from './dto';
-import { Volunteer, VolunteerAssignment } from './entities';
+import { Volunteer, VolunteerAssignment } from '../entities';
 
 @Injectable()
 export class VolunteerService {
@@ -54,7 +54,6 @@ export class VolunteerService {
   }
 
   async create(volunteerDto: CreateVolunteerDto) {
-    Logger.debug(volunteerDto);
     try {
       const volunteer = await this.volunteerModel.create(volunteerDto);
       return volunteer;
