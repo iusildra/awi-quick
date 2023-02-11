@@ -22,7 +22,7 @@ export class AuthController {
 
   @Post('signup')
   @UsePipes(ValidationPipe)
-  async signup(@Body() signupDto: SignupDto) {
+  async signup(@Body(new ValidationPipe()) signupDto: SignupDto) {
     const { username, password } = signupDto;
 
     const userExists = await this.userModel.findOne({ where: { username } });

@@ -1,147 +1,96 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import {
   CreateVolunteerDto,
   UpdateVolunteerDto,
-  AssignVolunteerDto,
   UnassignVolunteerDto,
 } from './dto';
-import { Volunteer, VolunteerAssignment } from '../entities';
+import { Timeslot, Volunteer, VolunteerAssignment, Zone } from '../entities';
 
 @Injectable()
 export class VolunteerService {
   constructor(
     @InjectModel(Volunteer)
     private readonly volunteerModel: typeof Volunteer,
+    @InjectModel(Zone)
+    private readonly zoneModel: typeof Zone,
+    @InjectModel(Timeslot)
+    private readonly timeslotModel: typeof Timeslot,
     @InjectModel(VolunteerAssignment)
     private readonly volunteerAssignmentModel: typeof VolunteerAssignment,
   ) {}
 
-  async findAll() {
-    try {
-      const volunteers = await this.volunteerModel.findAll();
-      return volunteers;
-    } catch (err) {
-      Logger.error(err);
-    }
+  findAll() {
+    return this.volunteerModel.findAll();
   }
 
-  async findWithTimeslotByZone(zoneId: number, zoneNumber: number) {
-    try {
-      const volunteers = await this.volunteerAssignmentModel.findAll({
-        where: {
-          zoneId,
-          zoneNumber,
-        },
-      });
-      return volunteers.map((v) => v.volunteerId);
-    } catch (err) {
-      Logger.error(err);
-    }
+  findOne(id: string) {
+    return this.volunteerModel.findOne({ where: { id } });
   }
 
-  async findWithZoneByTimeslot(timeslotId: number) {
-    try {
-      const volunteers = await this.volunteerAssignmentModel.findAll({
-        where: {
-          timeslotId,
-        },
-      });
-      return volunteers.map((v) => v.volunteerId);
-    } catch (err) {
-      Logger.error(err);
-    }
+  findByMail(email: string) {
+    return this.volunteerModel.findOne({ where: { email } });
   }
 
-  async create(volunteerDto: CreateVolunteerDto) {
-    try {
-      const volunteer = await this.volunteerModel.create(volunteerDto);
-      return volunteer;
-    } catch (err) {
-      Logger.error(err);
-    }
+  findByUsername(username: string) {
+    return this.volunteerModel.findOne({ where: { username } });
   }
 
-  async read(id: string) {
-    try {
-      const volunteer = await this.volunteerModel.findOne({ where: { id } });
-      return volunteer;
-    } catch (err) {
-      Logger.error(err);
-    }
+  async findWithTimeslotByZone(id: number) {
+    const volunteers = await this.zoneModel.findOne({
+      where: { id },
+      include: [Volunteer],
+    });
+    return volunteers.volunteers;
   }
 
-  async update(id: string, data: UpdateVolunteerDto) {
-    try {
-      const volunteer = await this.volunteerModel.update(data, {
-        where: { id },
-      });
-      return volunteer;
-    } catch (err) {
-      Logger.error(err);
-    }
+  async findWithZoneByTimeslot(id: number) {
+    const volunteers = await this.timeslotModel.findOne({
+      where: { id },
+      include: [Volunteer],
+    });
+    return volunteers.volunteers;
   }
 
-  async destroy(id: string) {
-    try {
-      const volunteer = await this.volunteerModel.destroy({ where: { id } });
-      return volunteer;
-    } catch (err) {
-      Logger.error(err);
-    }
+  create(volunteerDto: CreateVolunteerDto) {
+    return this.volunteerModel.create(volunteerDto);
   }
 
-  async assign(
-    id: string,
-    zoneId: number,
-    zoneNumber: number,
-    timeslotIds: AssignVolunteerDto,
+  update(id: string, data: UpdateVolunteerDto) {
+    return this.volunteerModel.update(data, {
+      where: { id },
+    });
+  }
+
+  destroy(id: string) {
+    return this.volunteerModel.destroy({ where: { id } });
+  }
+
+  getExistingAssignments(volunteerId: string) {
+    return this.volunteerAssignmentModel.findAll({
+      where: {
+        volunteerId,
+      },
+    });
+  }
+
+  registerAssignments(
+    entries: { volunteerId: string; zoneId: number; timeslotId: number }[],
   ) {
-    try {
-      const currentAssignments = await this.volunteerAssignmentModel.findAll({
-        where: {
-          volunteerId: id,
-          zoneId,
-          zoneNumber,
-        },
-      });
-
-      const assignmentAdded = await this.volunteerAssignmentModel.bulkCreate(
-        timeslotIds.timeslotIds
-          .filter(
-            (x) => !currentAssignments.map((a) => a.timeslotId).includes(x),
-          )
-          .map((timeslotId) => ({
-            volunteerId: id,
-            zoneId,
-            zoneNumber,
-            timeslotId,
-          })),
-      );
-      return assignmentAdded.length;
-    } catch (err) {
-      Logger.error(err);
-    }
+    return this.volunteerAssignmentModel.bulkCreate(entries);
   }
 
-  async unassign(
+  unregisterAssignments(
     id: string,
     zoneId: number,
-    zoneNumber: number,
     timeslotIds: UnassignVolunteerDto,
   ) {
-    try {
-      const assignmentRemoved = await this.volunteerAssignmentModel.destroy({
-        where: {
-          volunteerId: id,
-          zoneId,
-          zoneNumber,
-          timeslotId: timeslotIds.timeslotIds,
-        },
-      });
-      return assignmentRemoved;
-    } catch (err) {
-      Logger.error(err);
-    }
+    return this.volunteerAssignmentModel.destroy({
+      where: {
+        volunteerId: id,
+        zoneId,
+        timeslotId: timeslotIds.timeslotIds,
+      },
+    });
   }
 }

@@ -1,39 +1,38 @@
-import { Table, Column, Model, DataType } from 'sequelize-typescript';
+import {
+  Column,
+  DataType,
+  ForeignKey,
+  Model,
+  Table,
+} from 'sequelize-typescript';
+
+import { Timeslot } from './timeslot.entity';
+import { Volunteer } from './volunteer.entity';
+import { Zone } from './zone.entity';
 
 @Table({
   tableName: 'volunteer_assignments',
   timestamps: false,
 })
 export class VolunteerAssignment extends Model<VolunteerAssignment> {
+  @ForeignKey(() => Volunteer)
   @Column({
-    type: DataType.UUID,
-    defaultValue: DataType.UUIDV4,
     primaryKey: true,
-    // TODO: add foreign key
+    type: DataType.UUID,
   })
   volunteerId: string;
 
+  @ForeignKey(() => Zone)
   @Column({
-    type: DataType.INTEGER,
-    allowNull: false,
     primaryKey: true,
-    // TODO: add foreign key
+    type: DataType.INTEGER,
   })
   zoneId: number;
 
+  @ForeignKey(() => Timeslot)
   @Column({
-    type: DataType.INTEGER,
-    allowNull: false,
     primaryKey: true,
-    // TODO: add foreign key
-  })
-  zoneNumber: number;
-
-  @Column({
     type: DataType.INTEGER,
-    allowNull: false,
-    primaryKey: true,
-    // TODO: add foreign key
   })
   timeslotId: number;
 }

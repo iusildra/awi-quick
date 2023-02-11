@@ -1,6 +1,9 @@
-import { IsString, Length } from 'class-validator';
+import { IsString, IsUUID, Length } from 'class-validator';
 
-export class CreateVolunteerDto {
+export class GetVolunteerDto {
+  @IsUUID()
+  id: string;
+
   @IsString()
   @Length(2, 255)
   username: string;
@@ -16,8 +19,4 @@ export class CreateVolunteerDto {
   @IsString()
   @Length(2, 255)
   email: string;
-
-  @IsString()
-  @Length(8, 255)
-  password: string;
 }

@@ -1,5 +1,13 @@
-import { Table, Column, Model, DataType } from 'sequelize-typescript';
+import {
+  Table,
+  Column,
+  Model,
+  DataType,
+  BelongsToMany,
+} from 'sequelize-typescript';
 import { GameType } from '../game/dto/create-game.dto';
+import { Zone } from './zone.entity';
+import { GameZone } from './game-zone-relation.entity';
 
 @Table({
   tableName: 'games',
@@ -24,4 +32,7 @@ export class Game extends Model<Game> {
     allowNull: false,
   })
   type: GameType;
+
+  @BelongsToMany(() => Zone, () => GameZone)
+  zones: Zone[];
 }

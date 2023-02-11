@@ -2,17 +2,16 @@ import { Injectable, Logger } from '@nestjs/common';
 import { CreateGameDto, GameType } from './dto/create-game.dto';
 import { UpdateGameDto } from './dto/update-game.dto';
 import { InjectModel } from '@nestjs/sequelize';
-import { Game } from '../entities/game.entity';
+import { Game, Zone } from '../entities';
 import { Op } from 'sequelize';
-import { GameZone } from '../entities/game-zone-relation.entity';
 
 @Injectable()
 export class GameService {
   constructor(
     @InjectModel(Game)
     private readonly gameModel: typeof Game,
-    @InjectModel(GameZone)
-    private readonly gameZoneModel: typeof GameZone,
+    @InjectModel(Zone)
+    private readonly zoneModel: typeof Zone,
   ) {}
 
   async create(createGameDto: CreateGameDto) {
@@ -68,30 +67,13 @@ export class GameService {
     }
   }
 
-  extractGames(gameZones: GameZone[]) {
-    const ids = gameZones.map((gameZone) => gameZone.gameId);
-    return this.gameModel.findAll({ where: { id: ids } });
-  }
-
-  // TODO: use joins instead
-  async findByZone(zoneId: number) {
+  async findByZone(id: number) {
     try {
-      const games = await this.gameZoneModel
-        .findAll({ where: { zoneId } })
-        .then((gameZones) => this.extractGames(gameZones));
-      return games;
-    } catch (err) {
-      Logger.error(err);
-    }
-  }
-
-  // TODO: use joins instead
-  async findByPreciseZone(zoneId: number, zoneNumber: number) {
-    try {
-      const games = await this.gameZoneModel
-        .findAll({ where: { zoneId, zoneNumber } })
-        .then((gameZones) => this.extractGames(gameZones));
-      return games;
+      const games = await this.zoneModel.findOne({
+        where: { id },
+        include: [Game],
+      });
+      return games.games;
     } catch (err) {
       Logger.error(err);
     }

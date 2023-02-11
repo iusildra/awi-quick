@@ -47,28 +47,19 @@ export class ZoneService {
     }
   }
 
-  zipGameWithZone(
-    zoneId: number,
-    zoneNumber: number,
-    gameIds: AssignGameDto | UnassignGameDto,
-  ) {
+  zipGameWithZone(zoneId: number, gameIds: AssignGameDto | UnassignGameDto) {
     return gameIds.ids.map((gameId) => {
       return {
         zoneId,
-        zoneNumber,
         gameId,
       };
     });
   }
 
-  async assignGames(
-    zoneId: number,
-    zoneNumber: number,
-    assignGameDto: AssignGameDto,
-  ) {
+  async assignGames(zoneId: number, assignGameDto: AssignGameDto) {
     try {
       const zones = await this.gameZoneModel.bulkCreate(
-        this.zipGameWithZone(zoneId, zoneNumber, assignGameDto),
+        this.zipGameWithZone(zoneId, assignGameDto),
       );
       return zones.length;
     } catch (err) {
@@ -76,15 +67,11 @@ export class ZoneService {
     }
   }
 
-  async unassignGames(
-    zoneId: number,
-    zoneNumber: number,
-    unassignGameDto: UnassignGameDto,
-  ) {
+  async unassignGames(zoneId: number, unassignGameDto: UnassignGameDto) {
     try {
       const zones = await this.gameZoneModel.destroy({
         where: {
-          [Op.or]: this.zipGameWithZone(zoneId, zoneNumber, unassignGameDto),
+          [Op.or]: this.zipGameWithZone(zoneId, unassignGameDto),
         },
       });
       return zones;
@@ -102,21 +89,10 @@ export class ZoneService {
     }
   }
 
-  async findZones(id: number) {
-    try {
-      const zones = await this.zoneModel.findAll({
-        where: { id },
-      });
-      return zones;
-    } catch (err) {
-      Logger.error(err);
-    }
-  }
-
-  async findOne(id: number, num: number) {
+  async findOne(id: number) {
     try {
       const zone = await this.zoneModel.findOne({
-        where: { [Op.and]: [{ id }, { num: num }] },
+        where: { id },
       });
       return zone;
     } catch (err) {
@@ -124,10 +100,10 @@ export class ZoneService {
     }
   }
 
-  async update(id: number, num: number, updateZoneDto: UpdateZoneDto) {
+  async update(id: number, updateZoneDto: UpdateZoneDto) {
     try {
       const zone = await this.zoneModel.update(updateZoneDto, {
-        where: { [Op.and]: [{ id }, { num: num }] },
+        where: { id },
       });
       return zone;
     } catch (err) {
@@ -135,12 +111,11 @@ export class ZoneService {
     }
   }
 
-  async remove(id: number, num: number) {
+  //TODO: update `num` on remove
+  async remove(id: number) {
     try {
       const zone = await this.zoneModel.destroy({
-        where: {
-          [Op.and]: [{ id }, { num: num }],
-        },
+        where: { id },
       });
       return zone;
     } catch (err) {

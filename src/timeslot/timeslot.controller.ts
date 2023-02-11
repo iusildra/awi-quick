@@ -6,6 +6,7 @@ import {
   Param,
   Delete,
   Put,
+  ValidationPipe,
 } from '@nestjs/common';
 import { TimeslotService } from './timeslot.service';
 import { CreateTimeslotDto } from './dto/create-timeslot.dto';
@@ -16,7 +17,7 @@ export class TimeslotController {
   constructor(private readonly timeslotService: TimeslotService) {}
 
   @Post()
-  create(@Body() createTimeslotDto: CreateTimeslotDto) {
+  create(@Body(new ValidationPipe()) createTimeslotDto: CreateTimeslotDto) {
     return this.timeslotService.create(createTimeslotDto);
   }
 
@@ -38,7 +39,7 @@ export class TimeslotController {
   @Put(':id/')
   update(
     @Param('id') id: number,
-    @Body() updateTimeslotDto: UpdateTimeslotDto,
+    @Body(new ValidationPipe()) updateTimeslotDto: UpdateTimeslotDto,
   ) {
     return this.timeslotService.update(id, updateTimeslotDto);
   }

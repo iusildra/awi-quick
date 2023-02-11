@@ -1,4 +1,13 @@
-import { Table, Column, Model, DataType } from 'sequelize-typescript';
+import {
+  Table,
+  Column,
+  Model,
+  DataType,
+  BelongsToMany,
+} from 'sequelize-typescript';
+import { VolunteerAssignment } from './volunteer-assignment.entity';
+import { Volunteer } from './volunteer.entity';
+import { Zone } from './zone.entity';
 
 @Table({
   tableName: 'timeslots',
@@ -29,4 +38,14 @@ export class Timeslot extends Model<Timeslot> {
     allowNull: false,
   })
   name: string;
+
+  @BelongsToMany(() => Zone, {
+    through: { model: () => VolunteerAssignment, unique: false },
+  })
+  zones: Zone[];
+
+  @BelongsToMany(() => Volunteer, {
+    through: { model: () => VolunteerAssignment, unique: false },
+  })
+  volunteers: Volunteer[];
 }

@@ -1,22 +1,24 @@
-import { VolunteerController } from './volunteer.controller';
-import { VolunteerService } from './volunteer.service';
-import { SequelizeModule } from '@nestjs/sequelize';
-import { Volunteer } from '../entities/volunteer.entity';
 import {
   MiddlewareConsumer,
   Module,
   NestModule,
   RequestMethod,
 } from '@nestjs/common';
+import { SequelizeModule } from '@nestjs/sequelize';
+import { Timeslot, Volunteer, VolunteerAssignment, Zone } from '../entities';
 import { CheckAvailabilityMiddleware } from './middlewares/check-availability.middleware';
-import { VolunteerAssignment } from '../entities/volunteer-assignment.entity';
-import { Timeslot } from '../entities/timeslot.entity';
+import { VolunteerController } from './volunteer.controller';
+import { VolunteerService } from './volunteer.service';
+import { CheckExistingMiddleware } from './middlewares/check-existing.middleware';
 
 @Module({
   imports: [
-    SequelizeModule.forFeature([Volunteer]),
-    SequelizeModule.forFeature([VolunteerAssignment]),
-    SequelizeModule.forFeature([Timeslot]),
+    SequelizeModule.forFeature([
+      Timeslot,
+      Volunteer,
+      VolunteerAssignment,
+      Zone,
+    ]),
   ],
   controllers: [VolunteerController],
   providers: [VolunteerService],
@@ -24,7 +26,11 @@ import { Timeslot } from '../entities/timeslot.entity';
 export class VolunteerModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
     consumer.apply(CheckAvailabilityMiddleware).forRoutes({
-      path: 'volunteer/:id/assign/:zoneId/:zoneNumber',
+      path: 'volunteer/:id/assign/:zoneId',
+      method: RequestMethod.POST,
+    });
+    consumer.apply(CheckExistingMiddleware).forRoutes({
+      path: 'volunteer/',
       method: RequestMethod.POST,
     });
   }

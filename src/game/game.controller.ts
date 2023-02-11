@@ -6,6 +6,7 @@ import {
   Param,
   Delete,
   Put,
+  ValidationPipe,
 } from '@nestjs/common';
 import { GameService } from './game.service';
 import { CreateGameDto, UpdateGameDto, GameType } from './dto';
@@ -15,13 +16,39 @@ export class GameController {
   constructor(private readonly gameService: GameService) {}
 
   @Post()
-  create(@Body() createGameDto: CreateGameDto) {
+  create(@Body(new ValidationPipe()) createGameDto: CreateGameDto) {
     return this.gameService.create(createGameDto);
   }
 
   @Get()
   findAll() {
     return this.gameService.findAll();
+  }
+
+  @Get('types')
+  getTypes() {
+    return [
+      {
+        name: 'Child',
+        value: 'child',
+      },
+      {
+        name: 'Family',
+        value: 'family',
+      },
+      {
+        name: 'Ambiance',
+        value: 'ambiance',
+      },
+      {
+        name: 'Initiate',
+        value: 'initiate',
+      },
+      {
+        name: 'Expert',
+        value: 'expert',
+      },
+    ];
   }
 
   @Get(':id')
@@ -44,16 +71,11 @@ export class GameController {
     return this.gameService.findByZone(zoneId);
   }
 
-  @Get('zone/:zoneId/:zoneNumber')
-  findByPreciseZone(
-    @Param('zoneId') zoneId: number,
-    @Param('zoneNumber') zoneNumber: number,
-  ) {
-    return this.gameService.findByPreciseZone(zoneId, zoneNumber);
-  }
-
   @Put(':id')
-  update(@Param('id') id: string, @Body() updateGameDto: UpdateGameDto) {
+  update(
+    @Param('id') id: string,
+    @Body(new ValidationPipe()) updateGameDto: UpdateGameDto,
+  ) {
     return this.gameService.update(id, updateGameDto);
   }
 

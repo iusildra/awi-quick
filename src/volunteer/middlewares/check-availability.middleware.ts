@@ -45,39 +45,46 @@ export class CheckAvailabilityMiddleware implements NestMiddleware {
     );
   }
 
-  async hasOverlaps(currentAssignments: number[], newAssignments: number[]) {
+  async overlaps(currentAssignments: number[], newAssignments: number[]) {
     const currentTimeslots = await this.getTimeslots(currentAssignments);
     const newTimeslots = await this.getTimeslots(newAssignments);
 
-    return newTimeslots.some((newTimeslot) =>
-      currentTimeslots.some((currentTimeslot) => {
-        if (newTimeslot.id === currentTimeslot.id) return false;
-        else return this.isOverlapping(currentTimeslot, newTimeslot);
-      }),
+    return newTimeslots.filter((newTimeslot) =>
+      currentTimeslots.some((currentTimeslot) =>
+        this.isOverlapping(currentTimeslot, newTimeslot),
+      ),
     );
   }
 
   async use(req: Request, res: Response, next: NextFunction) {
     const volunteerId = req.params.id;
     const zoneId = Number(req.params.zoneId);
-    const zoneNumber = Number(req.params.zoneNumber);
     const newAssignments = req.body.timeslotIds;
 
     const currentAssignments = await this.volunteerAssignmentModel
-      .findAll({ where: { volunteerId, zoneId, zoneNumber } })
+      .findAll({ where: { volunteerId, zoneId } })
       .then((assignments) => assignments.map((a) => a.timeslotId));
 
-    if (await this.hasOverlaps(newAssignments, newAssignments)) {
+    const newAssignmentOverlaps = await this.overlaps(
+      newAssignments,
+      newAssignments,
+    );
+    if (newAssignmentOverlaps.length > 0) {
       res.status(400).send({
-        [responses.errorMessage]: 'Given timeslots overlap with each other',
+        [responses.errorMessage]: `Given timeslots overlap with each other`,
+        timeslots: newAssignmentOverlaps,
       });
       return;
     }
 
-    if (await this.hasOverlaps(currentAssignments, newAssignments)) {
+    const currentAssignmentOverlaps = await this.overlaps(
+      currentAssignments,
+      newAssignments,
+    );
+    if (currentAssignmentOverlaps.length > 0) {
       res.status(400).send({
-        [responses.errorMessage]:
-          'The new timeslots overlap with the current timeslots',
+        [responses.errorMessage]: `The new timeslots overlap with the current timeslots.`,
+        timeslots: currentAssignmentOverlaps,
       });
       return;
     }

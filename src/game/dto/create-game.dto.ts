@@ -1,7 +1,4 @@
-export class CreateGameDto {
-  name: string;
-  type: GameType;
-}
+import { IsEnum, IsString } from 'class-validator';
 
 export enum GameType {
   CHILD = 'child',
@@ -9,4 +6,12 @@ export enum GameType {
   AMBIANCE = 'ambiance',
   INITIATE = 'initiate',
   EXPERT = 'expert',
+}
+
+export class CreateGameDto {
+  @IsString()
+  name: string;
+
+  @IsEnum({ entity: GameType })
+  type: GameType;
 }
