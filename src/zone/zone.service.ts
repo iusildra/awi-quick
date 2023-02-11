@@ -30,21 +30,14 @@ export class ZoneService {
   }
 
   async append(id: number, createZoneDto: CreateZoneDto) {
-    try {
-      const lastZone = Number(
-        await this.zoneModel.max('num', {
-          where: { id },
-        }),
-      );
-      const zone = await this.zoneModel.create({
-        id,
-        num: lastZone + 1,
-        name: createZoneDto.name,
-      });
-      return zone;
-    } catch (err) {
-      Logger.error(err);
-    }
+    const lastZone: number = await this.zoneModel.max('num', {
+      where: { id },
+    });
+    return await this.zoneModel.create({
+      id,
+      num: lastZone + 1,
+      name: createZoneDto.name,
+    });
   }
 
   zipGameWithZone(zoneId: number, gameIds: AssignGameDto | UnassignGameDto) {
@@ -57,47 +50,26 @@ export class ZoneService {
   }
 
   async assignGames(zoneId: number, assignGameDto: AssignGameDto) {
-    try {
-      const zones = await this.gameZoneModel.bulkCreate(
-        this.zipGameWithZone(zoneId, assignGameDto),
-      );
-      return zones.length;
-    } catch (err) {
-      Logger.error(err);
-    }
+    const zones = await this.gameZoneModel.bulkCreate(
+      this.zipGameWithZone(zoneId, assignGameDto),
+    );
+    return zones.length;
   }
 
-  async unassignGames(zoneId: number, unassignGameDto: UnassignGameDto) {
-    try {
-      const zones = await this.gameZoneModel.destroy({
-        where: {
-          [Op.or]: this.zipGameWithZone(zoneId, unassignGameDto),
-        },
-      });
-      return zones;
-    } catch (err) {
-      Logger.error(err);
-    }
+  unassignGames(zoneId: number, unassignGameDto: UnassignGameDto) {
+    return this.gameZoneModel.destroy({
+      where: {
+        [Op.or]: this.zipGameWithZone(zoneId, unassignGameDto),
+      },
+    });
   }
 
-  async findAll() {
-    try {
-      const zones = await this.zoneModel.findAll();
-      return zones;
-    } catch (err) {
-      Logger.error(err);
-    }
+  findAll() {
+    return this.zoneModel.findAll();
   }
 
-  async findOne(id: number) {
-    try {
-      const zone = await this.zoneModel.findOne({
-        where: { id },
-      });
-      return zone;
-    } catch (err) {
-      Logger.error(err);
-    }
+  findOne(id: number) {
+    return this.zoneModel.findOne({ where: { id } });
   }
 
   async update(id: number, updateZoneDto: UpdateZoneDto) {

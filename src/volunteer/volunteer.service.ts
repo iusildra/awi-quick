@@ -1,11 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
-import {
-  CreateVolunteerDto,
-  UpdateVolunteerDto,
-  UnassignVolunteerDto,
-} from './dto';
+import { UpdateVolunteerDto, UnassignVolunteerDto, SignupDto } from './dto';
 import { Timeslot, Volunteer, VolunteerAssignment, Zone } from '../entities';
+import { Op } from 'sequelize';
 
 @Injectable()
 export class VolunteerService {
@@ -26,6 +23,15 @@ export class VolunteerService {
 
   findOne(id: string) {
     return this.volunteerModel.findOne({ where: { id } });
+  }
+
+  findByMailOrUsername(identification: string) {
+    Logger.debug(`Looking for: ${identification}`);
+    return this.volunteerModel.findOne({
+      where: {
+        [Op.or]: { email: identification, username: identification },
+      },
+    });
   }
 
   findByMail(email: string) {
@@ -52,7 +58,7 @@ export class VolunteerService {
     return volunteers.volunteers;
   }
 
-  create(volunteerDto: CreateVolunteerDto) {
+  create(volunteerDto: SignupDto) {
     return this.volunteerModel.create(volunteerDto);
   }
 

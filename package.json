@@ -22,7 +22,9 @@
   },
   "dependencies": {
     "@nestjs/common": "^9.0.0",
+    "@nestjs/config": "^2.3.1",
     "@nestjs/core": "^9.0.0",
+    "@nestjs/jwt": "^10.0.2",
     "@nestjs/mapped-types": "*",
     "@nestjs/passport": "^9.0.1",
     "@nestjs/platform-express": "^9.0.0",
@@ -34,6 +36,7 @@
     "dotenv": "^16.0.3",
     "jsonwebtoken": "^9.0.0",
     "passport": "^0.6.0",
+    "passport-jwt": "^4.0.1",
     "passport-local": "^1.0.0",
     "pg": "^8.9.0",
     "reflect-metadata": "^0.1.13",
@@ -53,6 +56,7 @@
     "@types/jest": "28.1.8",
     "@types/jsonwebtoken": "^9.0.1",
     "@types/node": "^16.18.12",
+    "@types/passport-jwt": "^3.0.8",
     "@types/passport-local": "^1.0.35",
     "@types/supertest": "^2.0.11",
     "@types/uuid": "^9.0.0",
@@ -78,7 +82,7 @@
       "ts"
     ],
     "rootDir": "src",
-    "testRegex": "src/volunteer/volunteer.controller.spec.ts",
+    "testRegex": ".*controller\\.spec\\.ts$",
     "transform": {
       "^.+\\.(t|j)s$": "ts-jest"
     },

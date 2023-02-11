@@ -1,4 +1,4 @@
-import { IsString, IsUUID, Length } from 'class-validator';
+import { IsEmail, IsString, IsUUID, Length } from 'class-validator';
 
 export class GetVolunteerDto {
   @IsUUID()
@@ -16,7 +16,7 @@ export class GetVolunteerDto {
   @Length(2, 255)
   lastName: string;
 
-  @IsString()
+  @IsEmail()
   @Length(2, 255)
   email: string;
 }

@@ -22,6 +22,7 @@ import { CheckExistingMiddleware } from './middlewares/check-existing.middleware
   ],
   controllers: [VolunteerController],
   providers: [VolunteerService],
+  exports: [VolunteerService],
 })
 export class VolunteerModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {

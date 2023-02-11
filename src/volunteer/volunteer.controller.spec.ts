@@ -1,8 +1,8 @@
+import { ConflictException } from '@nestjs/common';
 import { v4 as uuidv4 } from 'uuid';
+import { Timeslot, Volunteer, VolunteerAssignment, Zone } from '../entities';
 import { VolunteerController } from './volunteer.controller';
 import { VolunteerService } from './volunteer.service';
-import { Volunteer, Timeslot, VolunteerAssignment, Zone } from '../entities';
-import { CreateVolunteerDto } from './dto';
 
 const mockVolunteer = {
   id: uuidv4(),
@@ -15,7 +15,7 @@ describe('VolunteerController', () => {
   let volunteerController: VolunteerController;
   let volunteerService: VolunteerService;
 
-  beforeEach(async () => {
+  beforeAll(async () => {
     volunteerService = new VolunteerService(
       Volunteer,
       Zone,
@@ -118,30 +118,6 @@ describe('VolunteerController', () => {
     });
   });
 
-  describe('POST /', () => {
-    it('should create a volunteer', async () => {
-      const mockVolunteer = {
-        username: 'toto',
-        firstName: 'John',
-        lastName: 'Doe',
-        email: 'johndoe@example.com',
-      } as Volunteer;
-
-      jest
-        .spyOn(volunteerService, 'create')
-        .mockImplementation(() => Promise.resolve(mockVolunteer));
-
-      const response = await volunteerController.create(mockVolunteer);
-
-      expect(response).toBe(mockVolunteer);
-    });
-
-    // TODO - middleware
-    it('should throw an error if the volunteer mail/username already exists', async () => {
-      expect(true).toBe(true);
-    });
-  });
-
   describe('POST /:id/assign/:zoneId', () => {
     // TODO - maybe add a middleware call instead of controller call
     it('should assign a volunteer to a zone if there are not overlapping in its schedule', async () => {
@@ -186,6 +162,92 @@ describe('VolunteerController', () => {
           volunteerId: mockVolunteer.id,
           zoneId: 1,
           timeslotId: 1,
+        },
+      ] as VolunteerAssignment[];
+
+      jest
+        .spyOn(volunteerService, 'unregisterAssignments')
+        .mockImplementation(() => Promise.resolve(mockAssignment.length));
+
+      const response = await volunteerController.unassign(mockVolunteer.id, 1, {
+        timeslotIds: mockAssignment.map((a) => a.timeslotId),
+      });
+
+      expect(response).toBe(mockAssignment.length);
+    });
+  });
+
+  describe('PUT /:id', () => {
+    it('should update a volunteer', async () => {
+      jest
+        .spyOn(volunteerService, 'findByMail')
+        .mockImplementation(() => Promise.resolve(undefined));
+      jest
+        .spyOn(volunteerService, 'findByUsername')
+        .mockImplementation(() => Promise.resolve(undefined));
+      jest
+        .spyOn(volunteerService, 'update')
+        .mockImplementation(() => Promise.resolve([1]));
+
+      const response = await volunteerController.update(
+        mockVolunteer.id,
+        mockVolunteer,
+      );
+
+      expect(response).toStrictEqual([1]);
+    });
+
+    it('should throw an error if the volunteer mail already exists', async () => {
+      jest
+        .spyOn(volunteerService, 'findByMail')
+        .mockImplementation(() => Promise.resolve(mockVolunteer));
+      jest
+        .spyOn(volunteerService, 'findByUsername')
+        .mockImplementation(() => Promise.resolve(undefined));
+
+      expect(
+        volunteerController.update(mockVolunteer.id, mockVolunteer),
+      ).rejects.toBeInstanceOf(ConflictException);
+    });
+
+    it('should throw an error if the volunteer username already exists', async () => {
+      jest
+        .spyOn(volunteerService, 'findByMail')
+        .mockImplementation(() => Promise.resolve(undefined));
+      jest
+        .spyOn(volunteerService, 'findByUsername')
+        .mockImplementation(() => Promise.resolve(mockVolunteer));
+
+      expect(
+        volunteerController.update(mockVolunteer.id, mockVolunteer),
+      ).rejects.toBeInstanceOf(ConflictException);
+    });
+  });
+
+  describe('DELETE /:id', () => {
+    it('should delete a volunteer', async () => {
+      jest
+        .spyOn(volunteerService, 'destroy')
+        .mockImplementation(() => Promise.resolve(1));
+
+      const response = await volunteerController.destroy(mockVolunteer.id);
+
+      expect(response).toBe(1);
+    });
+  });
+
+  describe('DELETE /:id/unassign/:zoneId', () => {
+    it('should unassign a volunteer from a zone', async () => {
+      const mockAssignment = [
+        {
+          volunteerId: mockVolunteer.id,
+          zoneId: 1,
+          timeslotId: 1,
+        },
+        {
+          volunteerId: mockVolunteer.id,
+          zoneId: 1,
+          timeslotId: 2,
         },
       ] as VolunteerAssignment[];
 

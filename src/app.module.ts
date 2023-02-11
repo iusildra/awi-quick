@@ -1,3 +1,4 @@
+import { ConfigModule } from '@nestjs/config';
 import { Logger, Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
@@ -18,6 +19,7 @@ import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
+    ConfigModule.forRoot({ isGlobal: true }),
     SequelizeModule.forRoot({
       dialect: 'postgres',
       host: process.env.TOWER_DB_HOST || 'localhost',
@@ -39,7 +41,7 @@ import { AuthModule } from './auth/auth.module';
     GameModule,
     ZoneModule,
     TimeslotModule,
-    // AuthModule,
+    AuthModule,
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -53,6 +53,13 @@ export class Volunteer extends Model<Volunteer> {
   })
   password: string;
 
+  @Column({
+    type: DataType.BOOLEAN,
+    allowNull: false,
+    defaultValue: false,
+  })
+  isAdmin: boolean;
+
   @BelongsToMany(() => Zone, {
     through: { model: () => VolunteerAssignment, unique: false },
   })

@@ -7,6 +7,7 @@ import {
   Param,
   Delete,
   ValidationPipe,
+  NotFoundException,
 } from '@nestjs/common';
 import { ZoneService } from './zone.service';
 import { CreateZoneDto } from './dto/create-zone.dto';
@@ -16,6 +17,18 @@ import { AssignGameDto } from './dto/assign-game.dto';
 @Controller('zone')
 export class ZoneController {
   constructor(private readonly zoneService: ZoneService) {}
+
+  @Get()
+  findAll() {
+    return this.zoneService.findAll();
+  }
+
+  @Get(':id')
+  async findOne(@Param('id') id: number) {
+    const zone = await this.zoneService.findOne(id);
+    if (!zone) throw new NotFoundException('Zone not found');
+    return zone;
+  }
 
   @Post()
   create(@Body(new ValidationPipe()) createZoneDto: CreateZoneDto) {
@@ -39,24 +52,6 @@ export class ZoneController {
     return this.zoneService.assignGames(id, assignGameDto);
   }
 
-  @Delete(':id/unassign')
-  unassignGames(
-    @Param('id') id: number,
-    @Body(new ValidationPipe()) assignGameDto: AssignGameDto,
-  ) {
-    return this.zoneService.unassignGames(id, assignGameDto);
-  }
-
-  @Get()
-  findAll() {
-    return this.zoneService.findAll();
-  }
-
-  @Get(':id')
-  findOne(@Param('id') id: number) {
-    return this.zoneService.findOne(id);
-  }
-
   @Patch(':id')
   update(
     @Param('id') id: number,
@@ -68,5 +63,13 @@ export class ZoneController {
   @Delete(':id')
   remove(@Param('id') id: number) {
     return this.zoneService.remove(id);
+  }
+
+  @Delete(':id/unassign')
+  unassignGames(
+    @Param('id') id: number,
+    @Body(new ValidationPipe()) assignGameDto: AssignGameDto,
+  ) {
+    return this.zoneService.unassignGames(id, assignGameDto);
   }
 }

@@ -1,49 +1,53 @@
 import {
   Controller,
   Post,
+  Request,
   Body,
   UsePipes,
   ValidationPipe,
-  HttpException,
-  HttpStatus,
+  UseGuards,
+  ConflictException,
 } from '@nestjs/common';
-import { InjectModel } from '@nestjs/sequelize';
-import { Volunteer } from '../entities';
-import SignupDto from './dto/signup.dto';
 import * as bcrypt from 'bcrypt';
 import * as jwt from 'jsonwebtoken';
+import { SignupDto } from '../volunteer/dto/signup.dto';
+import { AuthService } from './auth.service';
+import { LocalAuthGuard } from './local-auth.gard';
 
 @Controller('auth')
 export class AuthController {
-  constructor(
-    @InjectModel(Volunteer)
-    private readonly userModel: typeof Volunteer,
-  ) {}
+  constructor(private readonly authService: AuthService) {}
 
   @Post('signup')
   @UsePipes(ValidationPipe)
   async signup(@Body(new ValidationPipe()) signupDto: SignupDto) {
-    const { username, password } = signupDto;
+    const { email, password } = signupDto;
 
-    const userExists = await this.userModel.findOne({ where: { username } });
-    if (userExists) {
-      throw new HttpException(
-        'Volunteer already exists',
-        HttpStatus.BAD_REQUEST,
-      );
-    }
+    const userMailExists = await this.authService.findByMail(email);
+    if (userMailExists) throw new ConflictException('User already exists');
 
-    const hashedPassword = await bcrypt.hash(password, 10);
-    const user = await this.userModel.create({
-      username,
-      password: hashedPassword,
-    });
+    const usernameExists = await this.authService.findByUsername(email);
+    if (usernameExists) throw new ConflictException('Username already exists');
 
-    const payload = { username: user.username };
-    const accessToken = jwt.sign(payload, process.env.SECRET, {
-      expiresIn: '1h',
-    });
+    return bcrypt
+      .hash(password, 10)
+      .then((hash) => {
+        return this.authService.registerUser({
+          ...signupDto,
+          password: hash,
+        });
+      })
+      .then((user) => {
+        const payload = { username: user.username };
+        return jwt.sign(payload, process.env.JWTKEY, {
+          expiresIn: '6h',
+        });
+      });
+  }
 
-    return { accessToken };
+  @UseGuards(LocalAuthGuard)
+  @Post('signin')
+  async login(@Request() req) {
+    return this.authService.login(req.user);
   }
 }

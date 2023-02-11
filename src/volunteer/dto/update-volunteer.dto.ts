@@ -1,3 +1,3 @@
-import { CreateVolunteerDto } from './create-volunteer.dto';
+import { SignupDto } from './signup.dto';
 
-export class UpdateVolunteerDto extends CreateVolunteerDto {}
+export class UpdateVolunteerDto extends SignupDto {}

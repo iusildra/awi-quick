@@ -1,5 +1,6 @@
 import {
   Body,
+  ConflictException,
   Controller,
   Delete,
   Get,
@@ -11,7 +12,7 @@ import {
 
 import {
   AssignVolunteerDto,
-  CreateVolunteerDto,
+  SignupDto,
   UnassignVolunteerDto,
   UpdateVolunteerDto,
 } from './dto';
@@ -44,7 +45,7 @@ export class VolunteerController {
   }
 
   @Post()
-  create(@Body(new ValidationPipe()) data: CreateVolunteerDto) {
+  create(@Body(new ValidationPipe()) data: SignupDto) {
     return this.volunteerService.create(data);
   }
 
@@ -70,16 +71,25 @@ export class VolunteerController {
     return this.volunteerService.registerAssignments(newAssignments);
   }
 
-  // TODO unit tests
+  // TODO (PATCH :id) to add/remove admins
+
   @Put(':id')
-  update(
+  async update(
     @Param('id') id: string,
     @Body(new ValidationPipe()) data: UpdateVolunteerDto,
   ) {
+    const existingMail = await this.volunteerService.findByMail(data.email);
+    if (existingMail) throw new ConflictException('Email already in use');
+
+    const existingUsername = await this.volunteerService.findByUsername(
+      data.username,
+    );
+    if (existingUsername)
+      throw new ConflictException('Username already in use');
+
     return this.volunteerService.update(id, data);
   }
 
-  // TODO unit tests
   @Delete(':id')
   destroy(@Param('id') id: string) {
     return this.volunteerService.destroy(id);
