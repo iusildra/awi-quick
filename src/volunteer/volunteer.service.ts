@@ -1,3 +1,4 @@
+import { IsEmail } from 'class-validator';
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { UpdateVolunteerDto, UnassignVolunteerDto, SignupDto } from './dto';
@@ -17,16 +18,18 @@ export class VolunteerService {
     private readonly volunteerAssignmentModel: typeof VolunteerAssignment,
   ) {}
 
+  // tested
   findAll() {
     return this.volunteerModel.findAll();
   }
 
+  // tested
   findOne(id: string) {
     return this.volunteerModel.findOne({ where: { id } });
   }
 
+  // tested
   findByMailOrUsername(identification: string) {
-    Logger.debug(`Looking for: ${identification}`);
     return this.volunteerModel.findOne({
       where: {
         [Op.or]: { email: identification, username: identification },
@@ -34,10 +37,12 @@ export class VolunteerService {
     });
   }
 
+  // tested
   findByMail(email: string) {
     return this.volunteerModel.findOne({ where: { email } });
   }
 
+  // tested
   findByUsername(username: string) {
     return this.volunteerModel.findOne({ where: { username } });
   }
@@ -58,16 +63,19 @@ export class VolunteerService {
     return volunteers.volunteers;
   }
 
+  // tested
   create(volunteerDto: SignupDto) {
     return this.volunteerModel.create(volunteerDto);
   }
 
+  // tested
   update(id: string, data: UpdateVolunteerDto) {
     return this.volunteerModel.update(data, {
       where: { id },
     });
   }
 
+  // tested
   destroy(id: string) {
     return this.volunteerModel.destroy({ where: { id } });
   }
@@ -81,9 +89,17 @@ export class VolunteerService {
   }
 
   registerAssignments(
-    entries: { volunteerId: string; zoneId: number; timeslotId: number }[],
+    volunteerId: string,
+    zoneId: number,
+    timeslotIds: number[],
   ) {
-    return this.volunteerAssignmentModel.bulkCreate(entries);
+    return this.volunteerAssignmentModel.bulkCreate(
+      timeslotIds.map((timeslotId) => ({
+        volunteerId,
+        zoneId,
+        timeslotId,
+      })),
+    );
   }
 
   unregisterAssignments(

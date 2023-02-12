@@ -4,8 +4,8 @@ import { CreateTimeslotDto } from './create-timeslot.dto';
 
 export class UpdateTimeslotDto extends PartialType(CreateTimeslotDto) {
   @IsDate()
-  end: Date;
+  end?: Date;
 
   @IsString()
-  name: string;
+  name?: string;
 }

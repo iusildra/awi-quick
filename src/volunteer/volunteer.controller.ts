@@ -54,25 +54,24 @@ export class VolunteerController {
 
   @UseGuards(JwtAuthGuard)
   @Post(':id/assign/:zoneId')
-  assign(
+  async assign(
     @Param('id') id: string,
     @Param('zoneId') zoneId: number,
     @Body(new ValidationPipe()) data: AssignVolunteerDto,
   ) {
     const currentAssignments = this.volunteerService.getExistingAssignments(id);
 
-    const newAssignments = data.timeslotIds
-      .filter(
+    const newAssignments = await Promise.all(
+      data.timeslotIds.filter(
         async (x) =>
           !(await currentAssignments).map((a) => a.timeslotId).includes(x),
-      )
-      .map((timeslotId) => ({
-        volunteerId: id,
-        zoneId,
-        timeslotId,
-      }));
-
-    return this.volunteerService.registerAssignments(newAssignments);
+      ),
+    );
+    return this.volunteerService.registerAssignments(
+      id,
+      zoneId,
+      newAssignments,
+    );
   }
 
   // TODO (PATCH :id) to add/remove admins

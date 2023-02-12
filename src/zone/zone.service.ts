@@ -1,10 +1,10 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { CreateZoneDto } from './dto/create-zone.dto';
 import { UpdateZoneDto } from './dto/update-zone.dto';
-import { Zone } from '../entities/zone.entity';
 import { InjectModel } from '@nestjs/sequelize';
 import { Op } from 'sequelize';
 import { GameZone } from '../entities/game-zone-relation.entity';
+import { Game, Zone } from '../entities';
 
 @Injectable()
 export class ZoneService {
@@ -25,8 +25,8 @@ export class ZoneService {
 
   create(createZoneDto: CreateZoneDto) {
     return this.zoneModel.create({
-      num: 1,
       ...createZoneDto,
+      num: 1,
     });
   }
 
@@ -54,9 +54,18 @@ export class ZoneService {
     });
   }
 
-  async assignGames(zoneId: number, assignGameDto: string[]) {
+  async assignGames(zoneId: number, gameIds: string[]) {
+    const existingAssignments = await this.zoneModel.findOne({
+      where: {
+        id: zoneId,
+      },
+      include: [Game],
+    });
+    const gamesToInsert = gameIds.filter(
+      (id) => !existingAssignments.games.some((game) => game.id === id),
+    );
     const zones = await this.gameZoneModel.bulkCreate(
-      this.zipGameWithZone(zoneId, assignGameDto),
+      this.zipGameWithZone(zoneId, gamesToInsert),
     );
     return zones.length;
   }

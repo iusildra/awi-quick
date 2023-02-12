@@ -2,13 +2,17 @@ import { ModelCtor, Sequelize } from 'sequelize-typescript';
 
 export async function createMemDB(models: ModelCtor[]): Promise<Sequelize> {
   const memDb = new Sequelize({
-    dialect: 'sqlite',
+    dialect: 'postgres',
     storage: ':memory:',
+    username: 'test',
+    password: 'test',
+    database: 'test',
     logging: false,
+    host: 'localhost',
+    port: 5433,
   });
   memDb.addModels(models);
 
-  // Creates the database structure
   await memDb.sync();
 
   return memDb;

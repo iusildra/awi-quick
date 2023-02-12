@@ -1,6 +1,4 @@
-import { Test, TestingModule } from '@nestjs/testing';
 import { TimeslotService } from './timeslot.service';
-import { SequelizeModule } from '@nestjs/sequelize';
 import {
   Game,
   Timeslot,
@@ -9,30 +7,38 @@ import {
   Volunteer,
   GameZone,
 } from '../entities';
+import { createMemDB } from '../utils/createMemDb';
+import { Sequelize } from 'sequelize';
+
+const dummyTimeslot = {
+  begin: new Date(),
+  end: new Date(),
+  name: 'test',
+};
 
 describe('TimeslotService', () => {
   let service: TimeslotService;
-  let module: TestingModule;
-  const sequelize = SequelizeModule.forRoot({
-    dialect: 'postgres',
-    storage: ':memory:',
-    username: 'postgres',
-    password: 'postgres',
-    models: [Timeslot, VolunteerAssignment, Zone, Volunteer, GameZone, Game],
-    logging: false,
-  });
+  let memDb: Sequelize;
 
   beforeAll(async () => {
-    module = await Test.createTestingModule({
-      imports: [SequelizeModule.forFeature([Timeslot]), sequelize],
-      providers: [TimeslotService],
-    }).compile();
+    memDb = await createMemDB([
+      Timeslot,
+      VolunteerAssignment,
+      Zone,
+      Volunteer,
+      GameZone,
+      Game,
+    ]);
 
-    service = module.get<TimeslotService>(TimeslotService);
+    service = new TimeslotService(Timeslot);
+  });
+
+  afterEach(async () => {
+    await memDb.truncate({ truncate: true, cascade: true });
   });
 
   afterAll(async () => {
-    module.close();
+    memDb.close();
   });
 
   it('should be defined', () => {
@@ -40,11 +46,34 @@ describe('TimeslotService', () => {
   });
 
   it('should create a timeslot', async () => {
-    const timeslot = await service.create({
-      begin: new Date(),
-      end: new Date(),
-      name: 'test',
-    });
+    const timeslot = await service.create(dummyTimeslot);
     expect(timeslot).toBeDefined();
+  });
+
+  it('should find all timeslots', async () => {
+    const ts = [dummyTimeslot, dummyTimeslot, dummyTimeslot];
+    await Promise.all(ts.map((t) => service.create(t)));
+    const timeslots = await service.findAll();
+    expect(timeslots).toHaveLength(3);
+  });
+
+  it('should find a timeslot given an id', async () => {
+    const ts = await service.create(dummyTimeslot);
+    const timeslot = await service.findOne(ts.id);
+    expect(timeslot).toBeDefined();
+  });
+
+  it('should update a timeslot', async () => {
+    const ts = await service.create(dummyTimeslot);
+    const timeslot = await service.update(ts.id, {
+      name: 'updated',
+    });
+    expect(timeslot[0]).toBe(1);
+  });
+
+  it('should delete a timeslot', async () => {
+    const ts = await service.create(dummyTimeslot);
+    const timeslot = await service.remove(ts.id);
+    expect(timeslot).toBe(1);
   });
 });

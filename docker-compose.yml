@@ -13,6 +13,18 @@ services:
       - ./sql:/home
       - awi-quick-db-vol:/var/lib/postgresql/data
     restart: unless-stopped
+  test_db:
+    container_name: awi-quick-db-test
+    image: postgres:15.0-bullseye
+    environment:
+      POSTGRES_USER: test
+      POSTGRES_PASSWORD: test
+      POSTGRES_DB: test
+    ports:
+      - "5433:5432"
+    volumes:
+      - awi-quick-db-test-data:/var/lib/postgresql/data
 
 volumes:
   awi-quick-db-vol:
+  awi-quick-db-test-data:
