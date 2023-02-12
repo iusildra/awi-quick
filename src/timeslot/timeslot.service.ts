@@ -11,66 +11,29 @@ export class TimeslotService {
     private readonly timeslotModel: typeof Timeslot,
   ) {}
 
-  async create(createTimeslotDto: CreateTimeslotDto) {
-    try {
-      const timeslot = await this.timeslotModel.create(createTimeslotDto);
-      return timeslot;
-    } catch (err) {
-      console.log(err);
-    }
+  findAll() {
+    return this.timeslotModel.findAll();
   }
 
-  async findAll() {
-    try {
-      const timeslots = await this.timeslotModel.findAll();
-      return timeslots;
-    } catch (err) {
-      console.log(err);
-    }
+  findOne(id: number) {
+    return this.timeslotModel.findOne({
+      where: { id },
+    });
   }
 
-  async findTimeslots(id: number) {
-    try {
-      const timeslots = await this.timeslotModel.findAll({ where: { id } });
-      return timeslots;
-    } catch (err) {
-      console.log(err);
-    }
+  create(createTimeslotDto: CreateTimeslotDto) {
+    return this.timeslotModel.create(createTimeslotDto);
   }
 
-  async findOne(id: number) {
-    try {
-      const timeslot = await this.timeslotModel.findOne({
-        where: { id },
-      });
-      return timeslot;
-    } catch (err) {
-      console.log(err);
-    }
+  update(id: number, updateTimeslotDto: UpdateTimeslotDto) {
+    return this.timeslotModel.update(updateTimeslotDto, {
+      where: { id },
+    });
   }
 
-  async update(id: number, updateTimeslotDto: UpdateTimeslotDto) {
-    try {
-      const timeslotUpdated = await this.timeslotModel.update(
-        updateTimeslotDto,
-        {
-          where: { id },
-        },
-      );
-      return timeslotUpdated;
-    } catch (err) {
-      console.log(err);
-    }
-  }
-
-  async remove(id: number) {
-    try {
-      const timeslotDeleted = await this.timeslotModel.destroy({
-        where: { id },
-      });
-      return timeslotDeleted;
-    } catch (err) {
-      console.log(err);
-    }
+  remove(id: number) {
+    return this.timeslotModel.destroy({
+      where: { id },
+    });
   }
 }

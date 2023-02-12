@@ -8,5 +8,6 @@ import { Timeslot } from '../entities/timeslot.entity';
   imports: [SequelizeModule.forFeature([Timeslot])],
   controllers: [TimeslotController],
   providers: [TimeslotService],
+  exports: [TimeslotService],
 })
 export class TimeslotModule {}

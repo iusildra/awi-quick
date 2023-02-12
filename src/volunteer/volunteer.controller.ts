@@ -7,6 +7,7 @@ import {
   Param,
   Post,
   Put,
+  UseGuards,
   ValidationPipe,
 } from '@nestjs/common';
 
@@ -17,6 +18,7 @@ import {
   UpdateVolunteerDto,
 } from './dto';
 import { VolunteerService } from './volunteer.service';
+import { JwtAuthGuard } from '../auth/jwt-auth.gard';
 
 @Controller('volunteer')
 export class VolunteerController {
@@ -44,11 +46,13 @@ export class VolunteerController {
     return this.volunteerService.findWithZoneByTimeslot(timeslotId);
   }
 
+  @UseGuards(JwtAuthGuard)
   @Post()
   create(@Body(new ValidationPipe()) data: SignupDto) {
     return this.volunteerService.create(data);
   }
 
+  @UseGuards(JwtAuthGuard)
   @Post(':id/assign/:zoneId')
   assign(
     @Param('id') id: string,
@@ -72,7 +76,7 @@ export class VolunteerController {
   }
 
   // TODO (PATCH :id) to add/remove admins
-
+  @UseGuards(JwtAuthGuard)
   @Put(':id')
   async update(
     @Param('id') id: string,
@@ -90,11 +94,13 @@ export class VolunteerController {
     return this.volunteerService.update(id, data);
   }
 
+  @UseGuards(JwtAuthGuard)
   @Delete(':id')
   destroy(@Param('id') id: string) {
     return this.volunteerService.destroy(id);
   }
 
+  @UseGuards(JwtAuthGuard)
   @Delete(':id/unassign/:zoneId')
   unassign(
     @Param('id') id: string,

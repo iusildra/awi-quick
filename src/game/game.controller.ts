@@ -7,23 +7,15 @@ import {
   Delete,
   Put,
   ValidationPipe,
+  UseGuards,
 } from '@nestjs/common';
 import { GameService } from './game.service';
 import { CreateGameDto, UpdateGameDto, GameType } from './dto';
+import { JwtAuthGuard } from '../auth/jwt-auth.gard';
 
 @Controller('game')
 export class GameController {
   constructor(private readonly gameService: GameService) {}
-
-  @Post()
-  create(@Body(new ValidationPipe()) createGameDto: CreateGameDto) {
-    return this.gameService.create(createGameDto);
-  }
-
-  @Get()
-  findAll() {
-    return this.gameService.findAll();
-  }
 
   @Get('types')
   getTypes() {
@@ -51,6 +43,11 @@ export class GameController {
     ];
   }
 
+  @Get()
+  findAll() {
+    return this.gameService.findAll();
+  }
+
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.gameService.findOne(id);
@@ -71,6 +68,13 @@ export class GameController {
     return this.gameService.findByZone(zoneId);
   }
 
+  @UseGuards(JwtAuthGuard)
+  @Post()
+  create(@Body(new ValidationPipe()) createGameDto: CreateGameDto) {
+    return this.gameService.create(createGameDto);
+  }
+
+  @UseGuards(JwtAuthGuard)
   @Put(':id')
   update(
     @Param('id') id: string,
@@ -79,6 +83,7 @@ export class GameController {
     return this.gameService.update(id, updateGameDto);
   }
 
+  @UseGuards(JwtAuthGuard)
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.gameService.remove(id);

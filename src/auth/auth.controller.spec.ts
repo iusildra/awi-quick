@@ -2,6 +2,7 @@ import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { VolunteerService } from '../volunteer/volunteer.service';
 import { Zone, Timeslot, Volunteer, VolunteerAssignment } from '../entities';
+import { JwtService } from '@nestjs/jwt';
 
 const mockVolunteer = {
   username: 'toto',
@@ -23,7 +24,10 @@ describe('AuthController', () => {
       Timeslot,
       VolunteerAssignment,
     );
-    service = new AuthService(volunteerService);
+    service = new AuthService(
+      volunteerService,
+      new JwtService({ secret: 'secret' }),
+    );
     controller = new AuthController(service);
   });
 
@@ -38,16 +42,12 @@ describe('AuthController', () => {
         .mockImplementation(() => Promise.resolve(mockVolunteer));
 
       jest
-        .spyOn(volunteerService, 'findByMail')
-        .mockImplementation(() => Promise.resolve(null));
-
-      jest
-        .spyOn(volunteerService, 'findByUsername')
+        .spyOn(volunteerService, 'findByMailOrUsername')
         .mockImplementation(() => Promise.resolve(null));
 
       const response = await controller.signup(mockVolunteer);
 
-      expect(response).toBe(mockVolunteer);
+      expect(response).toHaveProperty('access_token');
     });
 
     // TODO - middleware
@@ -57,15 +57,7 @@ describe('AuthController', () => {
   });
 
   describe('POST /login', () => {
-    it('should return a token', async () => {
-      // TODO
-    });
-
-    it('should throw an error if the volunteer does not exist', async () => {
-      // TODO
-    });
-
-    it('should throw an error if the password is incorrect', async () => {
+    it('should throw a NotFoundException if the volunteer does not exist', async () => {
       // TODO
     });
   });

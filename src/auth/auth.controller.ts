@@ -6,10 +6,8 @@ import {
   UsePipes,
   ValidationPipe,
   UseGuards,
-  ConflictException,
 } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
-import * as jwt from 'jsonwebtoken';
 import { SignupDto } from '../volunteer/dto/signup.dto';
 import { AuthService } from './auth.service';
 import { LocalAuthGuard } from './local-auth.gard';
@@ -20,34 +18,23 @@ export class AuthController {
 
   @Post('signup')
   @UsePipes(ValidationPipe)
-  async signup(@Body(new ValidationPipe()) signupDto: SignupDto) {
-    const { email, password } = signupDto;
-
-    const userMailExists = await this.authService.findByMail(email);
-    if (userMailExists) throw new ConflictException('User already exists');
-
-    const usernameExists = await this.authService.findByUsername(email);
-    if (usernameExists) throw new ConflictException('Username already exists');
+  signup(@Body(new ValidationPipe()) signupDto: SignupDto) {
+    const { password } = signupDto;
 
     return bcrypt
       .hash(password, 10)
-      .then((hash) => {
-        return this.authService.registerUser({
+      .then((hash) =>
+        this.authService.registerUser({
           ...signupDto,
           password: hash,
-        });
-      })
-      .then((user) => {
-        const payload = { username: user.username };
-        return jwt.sign(payload, process.env.JWTKEY, {
-          expiresIn: '6h',
-        });
-      });
+        }),
+      )
+      .then((user) => this.authService.login(user));
   }
 
   @UseGuards(LocalAuthGuard)
   @Post('signin')
-  async login(@Request() req) {
+  login(@Request() req: any) {
     return this.authService.login(req.user);
   }
 }

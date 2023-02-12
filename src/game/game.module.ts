@@ -11,5 +11,6 @@ import { SequelizeModule } from '@nestjs/sequelize';
   ],
   controllers: [GameController],
   providers: [GameService],
+  exports: [GameService],
 })
 export class GameModule {}

@@ -12,6 +12,6 @@ export class CreateGameDto {
   @IsString()
   name: string;
 
-  @IsEnum({ entity: GameType })
+  @IsEnum(GameType, { message: 'Invalid game type' })
   type: GameType;
 }

@@ -1,20 +1,20 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { VolunteerService } from '../volunteer/volunteer.service';
 import { SignupDto } from '../volunteer/dto/signup.dto';
 import * as bcrypt from 'bcrypt';
 import { Volunteer } from '../entities/volunteer.entity';
-import * as jwt from 'jsonwebtoken';
+import { JwtService } from '@nestjs/jwt';
+import { TokenPayload } from './dto/token.dto';
 
 @Injectable()
 export class AuthService {
-  constructor(private readonly volunteersService: VolunteerService) {}
+  constructor(
+    private readonly volunteersService: VolunteerService,
+    private jwtService: JwtService,
+  ) {}
 
-  findByMail(identification: string) {
-    return this.volunteersService.findByMailOrUsername(identification);
-  }
-
-  findByUsername(identification: string) {
-    return this.volunteersService.findByMailOrUsername(identification);
+  findUserById(id: string) {
+    return this.volunteersService.findOne(id);
   }
 
   registerUser(user: SignupDto) {
@@ -25,25 +25,22 @@ export class AuthService {
     const user = await this.volunteersService.findByMailOrUsername(
       identification,
     );
-    const res = await bcrypt.compare(pwd, user.password);
+    if (!user) return null;
 
-    Logger.debug(`User ${user.username} is valid: ${res}`);
+    const res = await bcrypt.compare(pwd, user.password);
     if (res) return { id: user.id, username: user.username, email: user.email };
-    else return undefined;
+    else return null;
   }
 
-  // TODO use jwtService.sign(payload) instead
   async login(user: Volunteer) {
-    const payload = {
+    const payload: TokenPayload = {
       username: user.username,
-      userId: user.id,
+      sub: user.id,
       isAdmin: user.isAdmin,
     };
 
     return {
-      access_token: jwt.sign(payload, process.env.JWTKEY, {
-        expiresIn: '6h',
-      }),
+      access_token: this.jwtService.sign(payload),
     };
   }
 }

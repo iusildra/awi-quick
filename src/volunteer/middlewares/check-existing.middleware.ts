@@ -10,13 +10,11 @@ export class CheckExistingMiddleware implements NestMiddleware {
     const { email, username } = req.body;
 
     const existingEmail = await this.volunteerService.findByMail(email);
-
     if (existingEmail) throw new ConflictException('Email already taken');
 
     const existingUsername = await this.volunteerService.findByUsername(
       username,
     );
-
     if (existingUsername) throw new ConflictException('Username already taken');
 
     next();
