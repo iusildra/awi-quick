@@ -28,21 +28,12 @@ export class CheckAvailabilityMiddleware implements NestMiddleware {
 
   // TODO: check if this is correct
   isOverlapping(current: Timeslot, incoming: Timeslot) {
-    const same =
-      current.begin === incoming.begin && current.end === incoming.end;
-    const currentInsideIncoming =
-      current.begin > incoming.begin && current.end < incoming.end;
-    const currentLeftOverlapsIncoming =
-      current.begin <= incoming.begin && current.end > incoming.begin;
-    const currentRightOverlapsIncoming =
-      current.begin < incoming.end && current.end >= incoming.end;
+    const different = incoming.id !== current.id;
+    const inside =
+      (incoming.begin > current.begin && incoming.begin < current.end) ||
+      (incoming.end > current.begin && incoming.end < current.end);
 
-    return (
-      same ||
-      currentInsideIncoming ||
-      currentLeftOverlapsIncoming ||
-      currentRightOverlapsIncoming
-    );
+    return different && inside;
   }
 
   async overlaps(currentAssignments: number[], newAssignments: number[]) {

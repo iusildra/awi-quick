@@ -50,17 +50,17 @@ export class VolunteerService {
   async findWithTimeslotByZone(id: number) {
     const volunteers = await this.zoneModel.findOne({
       where: { id },
-      include: [Volunteer],
+      include: [Timeslot, Volunteer],
     });
-    return volunteers.volunteers;
+    return volunteers;
   }
 
   async findWithZoneByTimeslot(id: number) {
     const volunteers = await this.timeslotModel.findOne({
       where: { id },
-      include: [Volunteer],
+      include: [Volunteer, Zone],
     });
-    return volunteers.volunteers;
+    return volunteers;
   }
 
   // tested
@@ -93,13 +93,21 @@ export class VolunteerService {
     zoneId: number,
     timeslotIds: number[],
   ) {
-    return this.volunteerAssignmentModel.bulkCreate(
-      timeslotIds.map((timeslotId) => ({
-        volunteerId,
-        zoneId,
-        timeslotId,
-      })),
-    );
+    return this.getExistingAssignments(volunteerId)
+      .then((assignments) => assignments.map((a) => a.timeslotId))
+      .then((existingTimeslotIds) =>
+        timeslotIds.filter((x) => !existingTimeslotIds.includes(x)),
+      )
+      .then((newAssignments) =>
+        this.volunteerAssignmentModel.bulkCreate(
+          newAssignments.map((timeslotId) => ({
+            volunteerId,
+            zoneId,
+            timeslotId,
+          })),
+        ),
+      )
+      .then((assignments) => assignments.length);
   }
 
   unregisterAssignments(

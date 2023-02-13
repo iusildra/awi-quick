@@ -114,6 +114,47 @@ describe('VolunteerService', () => {
     expect(volunteer).toBe(1);
   });
 
+  it('should find every volunteer and their assignment given a zone id', async () => {
+    const volunteer = await service.create(dummyVolunteer);
+    const zone = await Zone.create({
+      num: 1,
+      name: 'test',
+    });
+    const timeslots = await Timeslot.bulkCreate(dummyTimeslots);
+
+    await VolunteerAssignment.bulkCreate(
+      timeslots.map((t) => ({
+        volunteerId: volunteer.id,
+        zoneId: zone.id,
+        timeslotId: t.id,
+      })),
+    );
+    const zones = await service.findWithTimeslotByZone(zone.id);
+    expect(zones.volunteers).toHaveLength(1);
+    expect(zones.timeslots).toHaveLength(3);
+  });
+
+  it('should find every volunteer and their assignment given a timeslot id', async () => {
+    const volunteer = await service.create(dummyVolunteer);
+    const zone = await Zone.create({
+      num: 1,
+      name: 'test',
+    });
+    const timeslots = await Timeslot.bulkCreate(dummyTimeslots);
+
+    await VolunteerAssignment.bulkCreate(
+      timeslots.map((t) => ({
+        volunteerId: volunteer.id,
+        zoneId: zone.id,
+        timeslotId: t.id,
+      })),
+    );
+
+    const zones = await service.findWithZoneByTimeslot(timeslots[0].id);
+    expect(zones.volunteers).toHaveLength(1);
+    expect(zones.zones).toHaveLength(1);
+  });
+
   describe('Assignment Registering', () => {
     it('should register a volunteer for multiple timeslot', async () => {
       const volunteer = await service.create(dummyVolunteer);
@@ -129,7 +170,7 @@ describe('VolunteerService', () => {
         zone.id,
         timeslots.map((t) => t.id),
       );
-      expect(ts).toHaveLength(3);
+      expect(ts).toBe(3);
     });
 
     it('should register a volunteer for an assignment only if he is not already busy during that time', async () => {
@@ -147,7 +188,7 @@ describe('VolunteerService', () => {
         zone.id,
         timeslots.filter((t) => t.name != 'test1').map((t) => t.id),
       );
-      expect(ts).toHaveLength(2);
+      expect(ts).toBe(2);
 
       const ts2 = await middleware.overlaps(
         timeslots.filter((t) => t.name != 'test1').map((t) => t.id),
@@ -155,6 +196,29 @@ describe('VolunteerService', () => {
       );
       expect(ts2).toHaveLength(1);
       // Because the length of the array is 1, it means that the middleware has found an overlap, so it will reject the request
+    });
+
+    it('should not register assignments that are already present', async () => {
+      const volunteer = await service.create(dummyVolunteer);
+      const zone = await Zone.create({
+        num: 1,
+        name: 'test',
+      });
+      const timeslots = await Timeslot.bulkCreate(dummyTimeslots);
+
+      const newAssignments0 = await service.registerAssignments(
+        volunteer.id,
+        zone.id,
+        timeslots.map((t) => t.id),
+      );
+      expect(newAssignments0).toBe(3);
+
+      const newAssignments1 = await service.registerAssignments(
+        volunteer.id,
+        zone.id,
+        timeslots.map((t) => t.id),
+      );
+      expect(newAssignments1).toBe(0);
     });
   });
 });
