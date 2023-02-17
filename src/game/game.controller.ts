@@ -12,7 +12,9 @@ import {
 import { GameService } from './game.service';
 import { CreateGameDto, UpdateGameDto, GameType } from './dto';
 import { JwtAuthGuard } from '../auth/jwt-auth.gard';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags('game')
 @Controller('game')
 export class GameController {
   constructor(private readonly gameService: GameService) {}

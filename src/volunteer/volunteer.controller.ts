@@ -19,7 +19,9 @@ import {
 } from './dto';
 import { VolunteerService } from './volunteer.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.gard';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags('volunteer')
 @Controller('volunteer')
 export class VolunteerController {
   constructor(private volunteerService: VolunteerService) {}
@@ -46,11 +48,11 @@ export class VolunteerController {
     return this.volunteerService.findWithZoneByTimeslot(timeslotId);
   }
 
-  @UseGuards(JwtAuthGuard)
-  @Post()
-  create(@Body(new ValidationPipe()) data: SignupDto) {
-    return this.volunteerService.create(data);
-  }
+  // @UseGuards(JwtAuthGuard)
+  // @Post()
+  // create(@Body(new ValidationPipe()) data: SignupDto) {
+  //   return this.volunteerService.create(data);
+  // }
 
   @UseGuards(JwtAuthGuard)
   @Post(':id/assign/:zoneId')

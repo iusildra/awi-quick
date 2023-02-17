@@ -13,7 +13,9 @@ import { TimeslotService } from './timeslot.service';
 import { CreateTimeslotDto } from './dto/create-timeslot.dto';
 import { UpdateTimeslotDto } from './dto/update-timeslot.dto';
 import { JwtAuthGuard } from '../auth/jwt-auth.gard';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags('timeslot')
 @Controller('timeslot')
 export class TimeslotController {
   constructor(private readonly timeslotService: TimeslotService) {}

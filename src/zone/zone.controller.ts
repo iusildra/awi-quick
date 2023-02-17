@@ -16,7 +16,9 @@ import { UpdateZoneDto } from './dto/update-zone.dto';
 import { AssignGameDto } from './dto/assign-game.dto';
 import { GameService } from '../game/game.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.gard';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags('zone')
 @Controller('zone')
 export class ZoneController {
   constructor(
