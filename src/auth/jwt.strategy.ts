@@ -1,13 +1,13 @@
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { PassportStrategy } from '@nestjs/passport';
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { TokenPayload } from './dto/token.dto';
+import { TokenPayloadDto } from './dto/token.dto';
 import { AuthService } from './auth.service';
 import { VolunteerNotFoundError } from './constants';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
-  constructor(private readonly authService: AuthService) {
+  constructor(protected readonly authService: AuthService) {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: false,
@@ -24,6 +24,6 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
       username: user.username,
       sub: payload.sub,
       isAdmin: user.isAdmin,
-    } as TokenPayload;
+    } as TokenPayloadDto;
   }
 }

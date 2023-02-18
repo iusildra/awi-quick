@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsBoolean, IsString } from 'class-validator';
 
-export class TokenPayload {
+export class TokenPayloadDto {
   @ApiProperty({ example: 'john', type: 'string' })
   @IsString()
   username: string;

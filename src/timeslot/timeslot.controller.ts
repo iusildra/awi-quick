@@ -12,7 +12,7 @@ import {
 import { TimeslotService } from './timeslot.service';
 import { CreateTimeslotDto } from './dto/create-timeslot.dto';
 import { UpdateTimeslotDto } from './dto/update-timeslot.dto';
-import { JwtAuthGuard } from '../auth/jwt-auth.gard';
+import { AdminJwtAuthGuard } from '../auth/admin-jwt-auth.gard';
 import { ApiTags } from '@nestjs/swagger';
 
 @ApiTags('timeslot')
@@ -30,13 +30,13 @@ export class TimeslotController {
     return this.timeslotService.findOne(id);
   }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(AdminJwtAuthGuard)
   @Post()
   create(@Body(new ValidationPipe()) createTimeslotDto: CreateTimeslotDto) {
     return this.timeslotService.create(createTimeslotDto);
   }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(AdminJwtAuthGuard)
   @Put(':id/')
   update(
     @Param('id') id: number,
@@ -45,7 +45,7 @@ export class TimeslotController {
     return this.timeslotService.update(id, updateTimeslotDto);
   }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(AdminJwtAuthGuard)
   @Delete(':id')
   remove(@Param('id') id: number) {
     return this.timeslotService.remove(id);

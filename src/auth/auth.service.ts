@@ -4,7 +4,7 @@ import { SignupDto } from '../volunteer/dto/signup.dto';
 import * as bcrypt from 'bcrypt';
 import { Volunteer } from '../entities/volunteer.entity';
 import { JwtService } from '@nestjs/jwt';
-import { TokenPayload } from './dto/token.dto';
+import { TokenPayloadDto } from './dto/token.dto';
 
 @Injectable()
 export class AuthService {
@@ -33,7 +33,7 @@ export class AuthService {
   }
 
   async login(user: Volunteer) {
-    const payload: TokenPayload = {
+    const payload: TokenPayloadDto = {
       username: user.username,
       sub: user.id,
       isAdmin: user.isAdmin,

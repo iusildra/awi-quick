@@ -15,8 +15,8 @@ import { CreateZoneDto } from './dto/create-zone.dto';
 import { UpdateZoneDto } from './dto/update-zone.dto';
 import { AssignGameDto } from './dto/assign-game.dto';
 import { GameService } from '../game/game.service';
-import { JwtAuthGuard } from '../auth/jwt-auth.gard';
 import { ApiTags } from '@nestjs/swagger';
+import { AdminJwtAuthGuard } from '../auth/admin-jwt-auth.gard';
 
 @ApiTags('zone')
 @Controller('zone')
@@ -38,14 +38,14 @@ export class ZoneController {
     return zone;
   }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(AdminJwtAuthGuard)
   @Post()
   create(@Body(new ValidationPipe()) createZoneDto: CreateZoneDto) {
     return this.zoneService.create(createZoneDto);
   }
 
   // TODO: not working, to patch
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(AdminJwtAuthGuard)
   @Post(':id')
   append(
     @Param('id') id: number,
@@ -54,23 +54,23 @@ export class ZoneController {
     return this.zoneService.append(id, createZoneDto);
   }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(AdminJwtAuthGuard)
   @Post(':id/assign')
   assignGames(
     @Param('id') id: number,
     @Body(new ValidationPipe()) assignGameDto: AssignGameDto,
   ) {
-    return this.gameService.findByZone(id).then((games) => {
-      return this.zoneService.assignGames(
+    return this.gameService.findByZone(id).then((games) =>
+      this.zoneService.assignGames(
         id,
         assignGameDto.ids.filter(
           (gameId) => !games.map((x) => x.id).includes(gameId),
         ),
-      );
-    });
+      ),
+    );
   }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(AdminJwtAuthGuard)
   @Patch(':id')
   update(
     @Param('id') id: number,
@@ -79,13 +79,13 @@ export class ZoneController {
     return this.zoneService.update(id, updateZoneDto);
   }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(AdminJwtAuthGuard)
   @Delete(':id')
   remove(@Param('id') id: number) {
     return this.zoneService.remove(id);
   }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(AdminJwtAuthGuard)
   @Delete(':id/unassign')
   unassignGames(
     @Param('id') id: number,

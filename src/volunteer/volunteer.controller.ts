@@ -13,13 +13,12 @@ import {
 
 import {
   AssignVolunteerDto,
-  SignupDto,
   UnassignVolunteerDto,
   UpdateVolunteerDto,
 } from './dto';
 import { VolunteerService } from './volunteer.service';
-import { JwtAuthGuard } from '../auth/jwt-auth.gard';
 import { ApiTags } from '@nestjs/swagger';
+import { AdminJwtAuthGuard } from 'src/auth/admin-jwt-auth.gard';
 
 @ApiTags('volunteer')
 @Controller('volunteer')
@@ -48,13 +47,13 @@ export class VolunteerController {
     return this.volunteerService.findWithZoneByTimeslot(timeslotId);
   }
 
-  // @UseGuards(JwtAuthGuard)
+  // @UseGuards(AdminJwtAuthGuard)
   // @Post()
   // create(@Body(new ValidationPipe()) data: SignupDto) {
   //   return this.volunteerService.create(data);
   // }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(AdminJwtAuthGuard)
   @Post(':id/assign/:zoneId')
   async assign(
     @Param('id') id: string,
@@ -77,7 +76,7 @@ export class VolunteerController {
   }
 
   // TODO (PATCH :id) to add/remove admins
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(AdminJwtAuthGuard)
   @Put(':id')
   async update(
     @Param('id') id: string,
@@ -95,13 +94,13 @@ export class VolunteerController {
     return this.volunteerService.update(id, data);
   }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(AdminJwtAuthGuard)
   @Delete(':id')
   destroy(@Param('id') id: string) {
     return this.volunteerService.destroy(id);
   }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(AdminJwtAuthGuard)
   @Delete(':id/unassign/:zoneId')
   unassign(
     @Param('id') id: string,

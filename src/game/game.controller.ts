@@ -11,7 +11,7 @@ import {
 } from '@nestjs/common';
 import { GameService } from './game.service';
 import { CreateGameDto, UpdateGameDto, GameType } from './dto';
-import { JwtAuthGuard } from '../auth/jwt-auth.gard';
+import { AdminJwtAuthGuard } from '../auth/admin-jwt-auth.gard';
 import { ApiTags } from '@nestjs/swagger';
 
 @ApiTags('game')
@@ -70,13 +70,13 @@ export class GameController {
     return this.gameService.findByZone(zoneId);
   }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(AdminJwtAuthGuard)
   @Post()
   create(@Body(new ValidationPipe()) createGameDto: CreateGameDto) {
     return this.gameService.create(createGameDto);
   }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(AdminJwtAuthGuard)
   @Put(':id')
   update(
     @Param('id') id: string,
@@ -85,7 +85,7 @@ export class GameController {
     return this.gameService.update(id, updateGameDto);
   }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(AdminJwtAuthGuard)
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.gameService.remove(id);

@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { CreateZoneDto } from './dto/create-zone.dto';
 import { UpdateZoneDto } from './dto/update-zone.dto';
 import { InjectModel } from '@nestjs/sequelize';
@@ -16,7 +16,16 @@ export class ZoneService {
   ) {}
 
   findAll() {
-    return this.zoneModel.findAll();
+    return this.zoneModel.findAll().then((zones) =>
+      zones.reduce((obj, item) => {
+        const key = item.name;
+        if (obj[key] === undefined) {
+          obj[key] = [];
+        }
+        obj[key].push(item);
+        return obj;
+      }, {}),
+    );
   }
 
   findOne(id: number) {
@@ -45,7 +54,7 @@ export class ZoneService {
       });
   }
 
-  zipGameWithZone(zoneId: number, gameIds: string[]) {
+  private zipGameWithZone(zoneId: number, gameIds: string[]) {
     return gameIds.map((gameId) => {
       return {
         zoneId,
