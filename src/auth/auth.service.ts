@@ -33,14 +33,18 @@ export class AuthService {
   }
 
   async login(user: Volunteer) {
-    const payload: TokenPayloadDto = {
-      username: user.username,
-      sub: user.id,
-      isAdmin: user.isAdmin,
-    };
+    return this.volunteersService.findOne(user.id).then((volunteer) => {
+      const payload: TokenPayloadDto = {
+        username: volunteer.username,
+        email: volunteer.email,
+        sub: volunteer.id,
+        isAdmin: volunteer.isAdmin,
+      };
 
-    return {
-      access_token: this.jwtService.sign(payload),
-    };
+      return {
+        ...payload,
+        access_token: this.jwtService.sign(payload),
+      };
+    });
   }
 }
