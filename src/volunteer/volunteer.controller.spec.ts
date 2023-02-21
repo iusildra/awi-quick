@@ -11,6 +11,19 @@ const mockVolunteer = {
   email: 'johndoe@example.com',
 } as Volunteer;
 
+const mockZone = {
+  id: 1,
+  num: 1,
+  name: 'Zone 1',
+} as Zone;
+
+const mockTimeslot = {
+  id: 1,
+  begin: '2020-01-01 00:00:00',
+  end: '2020-01-01 00:00:00',
+  name: 'Timeslot 1',
+} as unknown as Timeslot;
+
 describe('VolunteerController', () => {
   let volunteerController: VolunteerController;
   let volunteerService: VolunteerService;
@@ -82,16 +95,9 @@ describe('VolunteerController', () => {
 
   describe('GET /zone/:zoneId', () => {
     it('should return every volunteer in the given zone', async () => {
-      const mockVolunteer = {
-        id: uuidv4(),
-        firstName: 'John',
-        lastName: 'Doe',
-        email: 'johndoe@example.com',
-      } as Volunteer;
-
       jest
         .spyOn(volunteerService, 'findWithTimeslotByZone')
-        .mockImplementation(() => Promise.resolve([mockVolunteer]));
+        .mockImplementation(() => Promise.resolve([mockTimeslot]));
 
       const response = await volunteerController.findWithTimeslotByZone(1);
 
@@ -101,16 +107,9 @@ describe('VolunteerController', () => {
 
   describe('GET /timeslot/:timeslotId', () => {
     it('should return every volunteer in the given timeslot', async () => {
-      const mockVolunteer = {
-        id: uuidv4(),
-        firstName: 'John',
-        lastName: 'Doe',
-        email: 'johndoe@example.com',
-      } as Volunteer;
-
       jest
         .spyOn(volunteerService, 'findWithZoneByTimeslot')
-        .mockImplementation(() => Promise.resolve([mockVolunteer]));
+        .mockImplementation(() => Promise.resolve([mockZone]));
 
       const response = await volunteerController.findWithZoneByTimeslot(1);
 
@@ -135,7 +134,7 @@ describe('VolunteerController', () => {
 
       jest
         .spyOn(volunteerService, 'registerAssignments')
-        .mockImplementation(() => Promise.resolve(mockAssignment));
+        .mockImplementation(() => Promise.resolve(1));
 
       const response = await volunteerController.assign(mockVolunteer.id, 1, {
         timeslotIds: mockAssignment.map((a) => a.timeslotId),

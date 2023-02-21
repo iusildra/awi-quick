@@ -1,5 +1,4 @@
-import { IsEmail } from 'class-validator';
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { UpdateVolunteerDto, UnassignVolunteerDto, SignupDto } from './dto';
 import { Timeslot, Volunteer, VolunteerAssignment, Zone } from '../entities';
@@ -52,7 +51,7 @@ export class VolunteerService {
       where: { id },
       include: [Timeslot, Volunteer],
     });
-    return volunteers;
+    return volunteers.timeslots;
   }
 
   async findWithZoneByTimeslot(id: number) {
@@ -60,7 +59,7 @@ export class VolunteerService {
       where: { id },
       include: [Volunteer, Zone],
     });
-    return volunteers;
+    return volunteers.zones;
   }
 
   // tested
