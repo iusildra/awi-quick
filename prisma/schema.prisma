@@ -1,0 +1,100 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+generator dbml {
+  provider = "prisma-dbml-generator"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum enum_game_type {
+  child
+  family
+  ambiance
+  initiate
+  expert
+}
+
+enum enum_weekday {
+  Monday
+  Tuesday
+  Wednesday
+  Thursday
+  Friday
+  Saturday
+  Sunday
+}
+
+model game {
+  id          String            @id @default(uuid()) @db.Uuid
+  name        String            @db.VarChar(255)
+  type        enum_game_type
+  assignments game_assignment[]
+}
+
+model timeslot {
+  id                  Int                     @id @default(autoincrement())
+  weekday             enum_weekday            @default(Saturday)
+  start               DateTime                @db.Time()
+  end                 DateTime                @db.Time()
+  name                String                  @db.VarChar(255)
+  volunteers_assigned volunteer_assignments[]
+}
+
+model volunteer {
+  id          String                  @id @default(uuid()) @db.Uuid
+  username    String                  @unique @db.VarChar(255)
+  firstName   String                  @db.VarChar(255)
+  lastName    String                  @db.VarChar(255)
+  email       String                  @unique @db.VarChar(255)
+  password    String                  @db.VarChar(255)
+  isAdmin     Boolean                 @default(false)
+  assignments volunteer_assignments[]
+}
+
+model zone {
+  id    Int         @id @default(autoincrement())
+  name  String      @db.VarChar(255)
+  rooms zone_room[]
+}
+
+model zone_room {
+  id      Int          @id @default(autoincrement())
+  name    String       @db.VarChar(255)
+  zone_id Int
+  zone    zone         @relation(fields: [zone_id], references: [id])
+  tables  room_table[]
+}
+
+model room_table {
+  id          Int                     @id @default(autoincrement())
+  number      Int
+  room_id     Int
+  room        zone_room               @relation(fields: [room_id], references: [id])
+  games       game_assignment[]
+  assignments volunteer_assignments[]
+}
+
+model game_assignment {
+  table_id Int
+  game_id  String     @db.Uuid
+  game     game       @relation(fields: [game_id], references: [id], onDelete: Cascade)
+  table    room_table @relation(fields: [table_id], references: [id])
+
+  @@id([table_id, game_id])
+}
+
+model volunteer_assignments {
+  volunteer_id String     @db.Uuid
+  table_id     Int
+  timeslot_id  Int
+  timeslot     timeslot   @relation(fields: [timeslot_id], references: [id], onDelete: Cascade)
+  volunteer    volunteer  @relation(fields: [volunteer_id], references: [id], onDelete: Cascade)
+  table        room_table @relation(fields: [table_id], references: [id])
+
+  @@id([volunteer_id, table_id, timeslot_id])
+}

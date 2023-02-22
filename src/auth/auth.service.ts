@@ -2,9 +2,9 @@ import { Injectable } from '@nestjs/common';
 import { VolunteerService } from '../volunteer/volunteer.service';
 import { SignupDto } from '../volunteer/dto/signup.dto';
 import * as bcrypt from 'bcrypt';
-import { Volunteer } from '../entities/volunteer.entity';
 import { JwtService } from '@nestjs/jwt';
 import { TokenPayloadDto } from './dto/token.dto';
+import { Prisma, volunteer } from '@prisma/client';
 
 @Injectable()
 export class AuthService {
@@ -14,7 +14,7 @@ export class AuthService {
   ) {}
 
   findUserById(id: string) {
-    return this.volunteersService.findOne(id);
+    return this.volunteersService.findFirst(id);
   }
 
   registerUser(user: SignupDto) {
@@ -22,9 +22,7 @@ export class AuthService {
   }
 
   async validateUser(identification: string, pwd: string) {
-    const user = await this.volunteersService.findByMailOrUsername(
-      identification,
-    );
+    const user = await this.volunteersService.findByMail(identification);
     if (!user) return null;
 
     const res = await bcrypt.compare(pwd, user.password);
@@ -32,8 +30,8 @@ export class AuthService {
     else return null;
   }
 
-  async login(user: Volunteer) {
-    return this.volunteersService.findOne(user.id).then((volunteer) => {
+  async login(user: volunteer) {
+    return this.volunteersService.findFirst(user.id).then((volunteer) => {
       const payload: TokenPayloadDto = {
         username: volunteer.username,
         email: volunteer.email,

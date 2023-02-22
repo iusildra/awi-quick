@@ -47,12 +47,12 @@ export class GameController {
 
   @Get()
   findAll() {
-    return this.gameService.findAll();
+    return this.gameService.findMany();
   }
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.gameService.findOne(id);
+    return this.gameService.findFirst(id);
   }
 
   @Get('name/:name')
@@ -67,7 +67,7 @@ export class GameController {
 
   @Get('zone/:zoneId')
   findByZone(@Param('zoneId') zoneId: number) {
-    return this.gameService.findByZone(zoneId);
+    return this.gameService.findByZone(+zoneId);
   }
 
   @UseGuards(AdminJwtAuthGuard)

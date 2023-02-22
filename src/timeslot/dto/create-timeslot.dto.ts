@@ -8,7 +8,7 @@ export class CreateTimeslotDto {
     type: 'timestamp with time zone',
   })
   @IsDate()
-  begin: Date;
+  start: Date;
 
   @ApiProperty({
     example: '2020-01-01 10:00:00+00',

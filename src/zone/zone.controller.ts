@@ -17,6 +17,7 @@ import { AssignGameDto } from './dto/assign-game.dto';
 import { GameService } from '../game/game.service';
 import { ApiTags } from '@nestjs/swagger';
 import { AdminJwtAuthGuard } from '../auth/admin-jwt-auth.gard';
+import { CreateRoomDto } from './dto/create-room.dto';
 
 @ApiTags('zone')
 @Controller('zone')
@@ -44,27 +45,32 @@ export class ZoneController {
     return this.zoneService.create(createZoneDto);
   }
 
-  // TODO: not working, to patch
   @UseGuards(AdminJwtAuthGuard)
-  @Post(':id')
+  @Post(':id/append')
   append(
     @Param('id') id: number,
-    @Body(new ValidationPipe()) createZoneDto: CreateZoneDto,
+    @Body(new ValidationPipe()) createRoomDto: CreateRoomDto,
   ) {
-    return this.zoneService.append(id, createZoneDto);
+    return this.zoneService.append(id, createRoomDto);
   }
 
   @UseGuards(AdminJwtAuthGuard)
-  @Post(':id/assign')
+  @Post('room/:id/append')
+  appendTable(@Param('id') id: number) {
+    return this.zoneService.appendTable(id);
+  }
+
+  @UseGuards(AdminJwtAuthGuard)
+  @Post('table/:id/assign')
   assignGames(
     @Param('id') id: number,
     @Body(new ValidationPipe()) assignGameDto: AssignGameDto,
   ) {
-    return this.gameService.findByZone(id).then((games) =>
+    return this.gameService.findByTable(id).then((games) =>
       this.zoneService.assignGames(
         id,
         assignGameDto.ids.filter(
-          (gameId) => !games.map((x) => x.id).includes(gameId),
+          (gameId) => !games.some((res) => res.game.id == gameId),
         ),
       ),
     );
@@ -86,7 +92,7 @@ export class ZoneController {
   }
 
   @UseGuards(AdminJwtAuthGuard)
-  @Delete(':id/unassign')
+  @Delete('table/:id/unassign')
   unassignGames(
     @Param('id') id: number,
     @Body(new ValidationPipe()) assignGameDto: AssignGameDto,

@@ -1,11 +1,10 @@
 import { Module } from '@nestjs/common';
 import { TimeslotService } from './timeslot.service';
 import { TimeslotController } from './timeslot.controller';
-import { SequelizeModule } from '@nestjs/sequelize';
-import { Timeslot } from '../entities/timeslot.entity';
+import { PrismaModule } from 'src/prisma/prisma.module';
 
 @Module({
-  imports: [SequelizeModule.forFeature([Timeslot])],
+  imports: [PrismaModule],
   controllers: [TimeslotController],
   providers: [TimeslotService],
   exports: [TimeslotService],

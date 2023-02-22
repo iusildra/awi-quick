@@ -27,7 +27,7 @@ export class TimeslotController {
 
   @Get(':id')
   findOne(@Param('id') id: number) {
-    return this.timeslotService.findOne(id);
+    return this.timeslotService.findOne(+id);
   }
 
   @UseGuards(AdminJwtAuthGuard)
@@ -42,12 +42,12 @@ export class TimeslotController {
     @Param('id') id: number,
     @Body(new ValidationPipe()) updateTimeslotDto: UpdateTimeslotDto,
   ) {
-    return this.timeslotService.update(id, updateTimeslotDto);
+    return this.timeslotService.update(+id, updateTimeslotDto);
   }
 
   @UseGuards(AdminJwtAuthGuard)
   @Delete(':id')
   remove(@Param('id') id: number) {
-    return this.timeslotService.remove(id);
+    return this.timeslotService.remove(+id);
   }
 }

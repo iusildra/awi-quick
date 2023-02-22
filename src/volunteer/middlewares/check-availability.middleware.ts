@@ -1,37 +1,31 @@
 import { Injectable, NestMiddleware } from '@nestjs/common';
-import { InjectModel } from '@nestjs/sequelize';
 import { Request, Response, NextFunction } from 'express';
-import { VolunteerAssignment } from '../../entities/volunteer-assignment.entity';
-import { Timeslot } from '../../entities/timeslot.entity';
 import { responses } from '../../responses';
+import { PrismaService } from '../../prisma/prisma.service';
+import { timeslot } from '@prisma/client';
 
 @Injectable()
 export class CheckAvailabilityMiddleware implements NestMiddleware {
-  constructor(
-    @InjectModel(VolunteerAssignment)
-    private readonly volunteerAssignmentModel: typeof VolunteerAssignment,
-    @InjectModel(Timeslot)
-    private readonly timeslotModel: typeof Timeslot,
-  ) {}
+  constructor(private prisma: PrismaService) {}
 
   getTimeslots(ids: number[]) {
-    return this.timeslotModel.findAll({
+    return this.prisma.timeslot.findMany({
       where: {
-        id: ids,
+        AND: ids.map((id) => ({ id })),
       },
-      order: [
-        ['begin', 'ASC'],
-        ['end', 'ASC'],
-      ],
+      orderBy: {
+        start: 'asc',
+        end: 'asc',
+      },
     });
   }
 
   // TODO: check if this is correct
-  isOverlapping(current: Timeslot, incoming: Timeslot) {
+  isOverlapping(current: timeslot, incoming: timeslot) {
     const different = incoming.id !== current.id;
     const inside =
-      (incoming.begin > current.begin && incoming.begin < current.end) ||
-      (incoming.end > current.begin && incoming.end < current.end);
+      (incoming.start > current.start && incoming.start < current.end) ||
+      (incoming.end > current.start && incoming.end < current.end);
 
     return different && inside;
   }
@@ -49,12 +43,12 @@ export class CheckAvailabilityMiddleware implements NestMiddleware {
 
   async use(req: Request, res: Response, next: NextFunction) {
     const volunteerId = req.params.id;
-    const zoneId = Number(req.params.zoneId);
+    const tableId = Number(req.params.tableId);
     const newAssignments = req.body.timeslotIds;
 
-    const currentAssignments = await this.volunteerAssignmentModel
-      .findAll({ where: { volunteerId, zoneId } })
-      .then((assignments) => assignments.map((a) => a.timeslotId));
+    const currentAssignments = await this.prisma.volunteer_assignments
+      .findMany({ where: { volunteer_id: volunteerId, table_id: tableId } })
+      .then((assignments) => assignments.map((a) => a.timeslot_id));
 
     const newAssignmentOverlaps = await this.overlaps(
       newAssignments,

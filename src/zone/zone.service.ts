@@ -1,22 +1,15 @@
 import { Injectable } from '@nestjs/common';
 import { CreateZoneDto } from './dto/create-zone.dto';
 import { UpdateZoneDto } from './dto/update-zone.dto';
-import { InjectModel } from '@nestjs/sequelize';
-import { Op } from 'sequelize';
-import { GameZone } from '../entities/game-zone-relation.entity';
-import { Game, Zone } from '../entities';
+import { PrismaService } from '../prisma/prisma.service';
+import { CreateRoomDto } from './dto/create-room.dto';
 
 @Injectable()
 export class ZoneService {
-  constructor(
-    @InjectModel(Zone)
-    private readonly zoneModel: typeof Zone,
-    @InjectModel(GameZone)
-    private readonly gameZoneModel: typeof GameZone,
-  ) {}
+  constructor(private prisma: PrismaService) {}
 
   findAll() {
-    return this.zoneModel.findAll().then((zones) =>
+    return this.prisma.zone.findMany().then((zones) =>
       zones.reduce((obj, item) => {
         const key = item.name;
         if (obj[key] === undefined) {
@@ -29,73 +22,92 @@ export class ZoneService {
   }
 
   findOne(id: number) {
-    return this.zoneModel.findOne({ where: { id } });
+    return this.prisma.zone.findFirst({ where: { id } });
   }
 
   create(createZoneDto: CreateZoneDto) {
-    return this.zoneModel.create({
-      ...createZoneDto,
-      num: 1,
+    return this.prisma.zone.create({ data: createZoneDto });
+  }
+
+  append(id: number, createRoomDto: CreateRoomDto) {
+    return this.prisma.zone_room.create({
+      data: {
+        zone_id: id,
+        ...createRoomDto,
+      },
     });
   }
 
-  // TODO rework this shit
-  async append(id: number, createZoneDto: CreateZoneDto) {
-    return this.zoneModel
-      .max('num', {
-        where: { id },
+  appendTable(roomId: number) {
+    return this.prisma.room_table
+      .aggregate({
+        _max: {
+          number: true,
+        },
+        where: {
+          room_id: roomId,
+        },
       })
-      .then((lastZone: number) => {
-        return this.zoneModel.create({
-          id,
-          num: lastZone + 1,
-          name: createZoneDto.name,
-        });
-      });
+      .then((result) =>
+        this.prisma.room_table.create({
+          data: {
+            room_id: roomId,
+            number: result._max.number + 1,
+          },
+        }),
+      );
   }
 
-  private zipGameWithZone(zoneId: number, gameIds: string[]) {
-    return gameIds.map((gameId) => {
+  deleteRoom(roomId: number) {
+    return this.prisma.zone_room.delete({
+      where: {
+        id: roomId,
+      },
+    });
+  }
+
+  deleteTable(roomId: number) {
+    return this.prisma.room_table.delete({
+      where: {
+        id: roomId,
+      },
+    });
+  }
+
+  private zipGameWithZone(table_id: number, gameIds: string[]) {
+    return gameIds.map((game_id) => {
       return {
-        zoneId,
-        gameId,
+        table_id,
+        game_id,
       };
     });
   }
 
-  async assignGames(zoneId: number, gameIds: string[]) {
-    const existingAssignments = await this.zoneModel.findOne({
-      where: {
-        id: zoneId,
-      },
-      include: [Game],
-    });
-    const gamesToInsert = gameIds.filter(
-      (id) => !existingAssignments.games.some((game) => game.id === id),
-    );
-    const zones = await this.gameZoneModel.bulkCreate(
-      this.zipGameWithZone(zoneId, gamesToInsert),
-    );
-    return zones.length;
+  async assignGames(tableId: number, gameIds: string[]) {
+    return this.prisma.game_assignment
+      .createMany({
+        data: this.zipGameWithZone(tableId, gameIds),
+      })
+      .then((result) => result.count);
   }
 
   unassignGames(zoneId: number, unassignGameDto: string[]) {
-    return this.gameZoneModel.destroy({
+    return this.prisma.game_assignment.deleteMany({
       where: {
-        [Op.or]: this.zipGameWithZone(zoneId, unassignGameDto),
+        AND: this.zipGameWithZone(zoneId, unassignGameDto),
       },
     });
   }
 
   async update(id: number, updateZoneDto: UpdateZoneDto) {
-    return this.zoneModel.update(updateZoneDto, {
+    return this.prisma.zone.update({
       where: { id },
+      data: updateZoneDto,
     });
   }
 
-  //TODO: update `num` on remove
   async remove(id: number) {
-    return this.zoneModel.destroy({
+    return this.prisma.zone.delete({
       where: { id },
     });
   }

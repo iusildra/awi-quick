@@ -25,26 +25,27 @@ import { AdminJwtAuthGuard } from 'src/auth/admin-jwt-auth.gard';
 export class VolunteerController {
   constructor(private volunteerService: VolunteerService) {}
 
+  @UseGuards(AdminJwtAuthGuard)
   @Get()
   findAll() {
-    return this.volunteerService.findAll();
+    return this.volunteerService.findMany();
   }
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.volunteerService.findOne(id);
+    return this.volunteerService.findFirst(id);
   }
 
   @Get('zone/:zoneId')
   findWithTimeslotByZone(@Param('zoneId') zoneId: number) {
-    return this.volunteerService.findWithTimeslotByZone(zoneId);
+    return this.volunteerService.findWithTimeslotByZone(+zoneId);
   }
 
   // TODO: maybe add a route to find volunteers by "global" zone
 
   @Get('timeslot/:timeslotId')
   findWithZoneByTimeslot(@Param('timeslotId') timeslotId: number) {
-    return this.volunteerService.findWithZoneByTimeslot(timeslotId);
+    return this.volunteerService.findWithZoneByTimeslot(+timeslotId);
   }
 
   // @UseGuards(AdminJwtAuthGuard)
@@ -54,10 +55,10 @@ export class VolunteerController {
   // }
 
   @UseGuards(AdminJwtAuthGuard)
-  @Post(':id/assign/:zoneId')
+  @Post(':id/assign/:tableId')
   async assign(
     @Param('id') id: string,
-    @Param('zoneId') zoneId: number,
+    @Param('tableId') tableId: number,
     @Body(new ValidationPipe()) data: AssignVolunteerDto,
   ) {
     const currentAssignments = this.volunteerService.getExistingAssignments(id);
@@ -65,12 +66,12 @@ export class VolunteerController {
     const newAssignments = await Promise.all(
       data.timeslotIds.filter(
         async (x) =>
-          !(await currentAssignments).map((a) => a.timeslotId).includes(x),
+          !(await currentAssignments).map((a) => a.timeslot_id).includes(x),
       ),
     );
     return this.volunteerService.registerAssignments(
       id,
-      zoneId,
+      tableId,
       newAssignments,
     );
   }
@@ -101,12 +102,12 @@ export class VolunteerController {
   }
 
   @UseGuards(AdminJwtAuthGuard)
-  @Delete(':id/unassign/:zoneId')
+  @Delete(':id/unassign/:tableId')
   unassign(
     @Param('id') id: string,
-    @Param('zoneId') zoneId: number,
+    @Param('tableId') tableId: number,
     @Body(new ValidationPipe()) data: UnassignVolunteerDto,
   ) {
-    return this.volunteerService.unregisterAssignments(id, zoneId, data);
+    return this.volunteerService.unregisterAssignments(id, tableId, data);
   }
 }

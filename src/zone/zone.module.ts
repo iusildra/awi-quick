@@ -1,12 +1,11 @@
 import { Module } from '@nestjs/common';
 import { ZoneService } from './zone.service';
 import { ZoneController } from './zone.controller';
-import { SequelizeModule } from '@nestjs/sequelize';
-import { Zone, GameZone } from '../entities';
 import { GameModule } from '../game/game.module';
+import { PrismaModule } from 'src/prisma/prisma.module';
 
 @Module({
-  imports: [GameModule, SequelizeModule.forFeature([Zone, GameZone])],
+  imports: [GameModule, PrismaModule],
   controllers: [ZoneController],
   providers: [ZoneService],
   exports: [ZoneService],

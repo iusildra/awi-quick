@@ -1,0 +1,109 @@
+//// ------------------------------------------------------
+//// THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+//// ------------------------------------------------------
+
+Table game {
+  id String [pk]
+  name String [not null]
+  type enum_game_type [not null]
+  assignments game_assignment [not null]
+}
+
+Table timeslot {
+  id Int [pk, increment]
+  weekday enum_weekday [not null, default: 'Saturday']
+  start DateTime [not null]
+  end DateTime [not null]
+  name String [not null]
+  volunteers_assigned volunteer_assignments [not null]
+}
+
+Table volunteer {
+  id String [pk]
+  username String [unique, not null]
+  firstName String [not null]
+  lastName String [not null]
+  email String [unique, not null]
+  password String [not null]
+  isAdmin Boolean [not null, default: false]
+  assignments volunteer_assignments [not null]
+}
+
+Table zone {
+  id Int [pk, increment]
+  name String [not null]
+  rooms zone_room [not null]
+}
+
+Table zone_room {
+  id Int [pk, increment]
+  name String [not null]
+  zone_id Int [not null]
+  zone zone [not null]
+  tables room_table [not null]
+}
+
+Table room_table {
+  id Int [pk, increment]
+  number Int [not null]
+  room_id Int [not null]
+  room zone_room [not null]
+  games game_assignment [not null]
+  assignments volunteer_assignments [not null]
+}
+
+Table game_assignment {
+  table_id Int [not null]
+  game_id String [not null]
+  game game [not null]
+  table room_table [not null]
+
+  indexes {
+    (table_id, game_id) [pk]
+  }
+}
+
+Table volunteer_assignments {
+  volunteer_id String [not null]
+  table_id Int [not null]
+  timeslot_id Int [not null]
+  timeslot timeslot [not null]
+  volunteer volunteer [not null]
+  table room_table [not null]
+
+  indexes {
+    (volunteer_id, table_id, timeslot_id) [pk]
+  }
+}
+
+Enum enum_game_type {
+  child
+  family
+  ambiance
+  initiate
+  expert
+}
+
+Enum enum_weekday {
+  Monday
+  Tuesday
+  Wednesday
+  Thursday
+  Friday
+  Saturday
+  Sunday
+}
+
+Ref: zone_room.zone_id > zone.id
+
+Ref: room_table.room_id > zone_room.id
+
+Ref: game_assignment.game_id > game.id [delete: Cascade]
+
+Ref: game_assignment.table_id > room_table.id
+
+Ref: volunteer_assignments.timeslot_id > timeslot.id [delete: Cascade]
+
+Ref: volunteer_assignments.volunteer_id > volunteer.id [delete: Cascade]
+
+Ref: volunteer_assignments.table_id > room_table.id

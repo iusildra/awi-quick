@@ -1,39 +1,32 @@
 import { Injectable } from '@nestjs/common';
 import { CreateTimeslotDto } from './dto/create-timeslot.dto';
 import { UpdateTimeslotDto } from './dto/update-timeslot.dto';
-import { InjectModel } from '@nestjs/sequelize';
-import { Timeslot } from '../entities/timeslot.entity';
+import { PrismaService } from '../prisma/prisma.service';
 
 @Injectable()
 export class TimeslotService {
-  constructor(
-    @InjectModel(Timeslot)
-    private readonly timeslotModel: typeof Timeslot,
-  ) {}
+  constructor(private prisma: PrismaService) {}
 
   findAll() {
-    return this.timeslotModel.findAll();
+    return this.prisma.timeslot.findMany();
   }
 
   findOne(id: number) {
-    return this.timeslotModel.findOne({
-      where: { id },
-    });
+    return this.prisma.timeslot.findFirst({ where: { id } });
   }
 
   create(createTimeslotDto: CreateTimeslotDto) {
-    return this.timeslotModel.create(createTimeslotDto);
+    return this.prisma.timeslot.create({ data: createTimeslotDto });
   }
 
   update(id: number, updateTimeslotDto: UpdateTimeslotDto) {
-    return this.timeslotModel.update(updateTimeslotDto, {
+    return this.prisma.timeslot.update({
       where: { id },
+      data: updateTimeslotDto,
     });
   }
 
   remove(id: number) {
-    return this.timeslotModel.destroy({
-      where: { id },
-    });
+    return this.prisma.timeslot.delete({ where: { id } });
   }
 }

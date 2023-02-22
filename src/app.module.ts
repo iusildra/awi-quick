@@ -1,17 +1,8 @@
 import { ConfigModule } from '@nestjs/config';
-import { Logger, Module } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { VolunteerModule } from './volunteer/volunteer.module';
-import { SequelizeModule } from '@nestjs/sequelize';
-import {
-  Volunteer,
-  Game,
-  Zone,
-  Timeslot,
-  GameZone,
-  VolunteerAssignment,
-} from './entities';
 import { GameModule } from './game/game.module';
 import { ZoneModule } from './zone/zone.module';
 import { TimeslotModule } from './timeslot/timeslot.module';
@@ -20,23 +11,6 @@ import { AuthModule } from './auth/auth.module';
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
-    SequelizeModule.forRoot({
-      dialect: 'postgres',
-      host: process.env.DB_HOST,
-      port: parseInt(process.env.DB_PORT),
-      username: process.env.DB_USER,
-      password: process.env.DB_PASS,
-      database: process.env.DB_NAME,
-      models: [Volunteer, Game, Zone, Timeslot, GameZone, VolunteerAssignment],
-      autoLoadModels: true,
-      logging: process.env.NODE_ENV === 'PRODUCTION' ? false : Logger.debug,
-      pool: {
-        max: process.env.NODE_ENV === 'PRODUCTION' ? 50 : 2,
-        min: process.env.NODE_ENV === 'PRODUCTION' ? 20 : 2,
-        idle: 5000,
-      },
-      // sync: { force: true },
-    }),
     VolunteerModule,
     GameModule,
     ZoneModule,
