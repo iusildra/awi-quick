@@ -66,7 +66,7 @@ model zone_room {
   id      Int          @id @default(autoincrement())
   name    String       @db.VarChar(255)
   zone_id Int
-  zone    zone         @relation(fields: [zone_id], references: [id])
+  zone    zone         @relation(fields: [zone_id], references: [id], onDelete: Cascade)
   tables  room_table[]
 }
 
@@ -74,7 +74,7 @@ model room_table {
   id          Int                     @id @default(autoincrement())
   number      Int
   room_id     Int
-  room        zone_room               @relation(fields: [room_id], references: [id])
+  room        zone_room               @relation(fields: [room_id], references: [id], onDelete: Cascade)
   games       game_assignment[]
   assignments volunteer_assignments[]
 }

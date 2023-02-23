@@ -9,6 +9,7 @@ import {
   ValidationPipe,
   NotFoundException,
   UseGuards,
+  ParseIntPipe,
 } from '@nestjs/common';
 import { ZoneService } from './zone.service';
 import { CreateZoneDto } from './dto/create-zone.dto';
@@ -18,6 +19,7 @@ import { GameService } from '../game/game.service';
 import { ApiTags } from '@nestjs/swagger';
 import { AdminJwtAuthGuard } from '../auth/admin-jwt-auth.gard';
 import { CreateRoomDto } from './dto/create-room.dto';
+import { UnassignGameDto } from './dto/unassign-game.dto';
 
 @ApiTags('zone')
 @Controller('zone')
@@ -33,7 +35,7 @@ export class ZoneController {
   }
 
   @Get(':id')
-  async findOne(@Param('id') id: number) {
+  async findOne(@Param('id', ParseIntPipe) id: number) {
     const zone = await this.zoneService.findOne(id);
     if (!zone) throw new NotFoundException('Zone not found');
     return zone;
@@ -48,7 +50,7 @@ export class ZoneController {
   @UseGuards(AdminJwtAuthGuard)
   @Post(':id/append')
   append(
-    @Param('id') id: number,
+    @Param('id', ParseIntPipe) id: number,
     @Body(new ValidationPipe()) createRoomDto: CreateRoomDto,
   ) {
     return this.zoneService.append(id, createRoomDto);
@@ -56,14 +58,14 @@ export class ZoneController {
 
   @UseGuards(AdminJwtAuthGuard)
   @Post('room/:id/append')
-  appendTable(@Param('id') id: number) {
+  appendTable(@Param('id', ParseIntPipe) id: number) {
     return this.zoneService.appendTable(id);
   }
 
   @UseGuards(AdminJwtAuthGuard)
   @Post('table/:id/assign')
   assignGames(
-    @Param('id') id: number,
+    @Param('id', ParseIntPipe) id: number,
     @Body(new ValidationPipe()) assignGameDto: AssignGameDto,
   ) {
     return this.gameService.findByTable(id).then((games) =>
@@ -79,7 +81,7 @@ export class ZoneController {
   @UseGuards(AdminJwtAuthGuard)
   @Patch(':id')
   update(
-    @Param('id') id: number,
+    @Param('id', ParseIntPipe) id: number,
     @Body(new ValidationPipe()) updateZoneDto: UpdateZoneDto,
   ) {
     return this.zoneService.update(id, updateZoneDto);
@@ -87,15 +89,15 @@ export class ZoneController {
 
   @UseGuards(AdminJwtAuthGuard)
   @Delete(':id')
-  remove(@Param('id') id: number) {
+  remove(@Param('id', ParseIntPipe) id: number) {
     return this.zoneService.remove(id);
   }
 
   @UseGuards(AdminJwtAuthGuard)
   @Delete('table/:id/unassign')
   unassignGames(
-    @Param('id') id: number,
-    @Body(new ValidationPipe()) assignGameDto: AssignGameDto,
+    @Param('id', ParseIntPipe) id: number,
+    @Body(new ValidationPipe()) assignGameDto: UnassignGameDto,
   ) {
     return this.zoneService.unassignGames(id, assignGameDto.ids);
   }

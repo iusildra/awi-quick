@@ -8,6 +8,7 @@ import {
   Put,
   ValidationPipe,
   UseGuards,
+  ParseIntPipe,
 } from '@nestjs/common';
 import { GameService } from './game.service';
 import { CreateGameDto, UpdateGameDto, GameType } from './dto';
@@ -66,8 +67,8 @@ export class GameController {
   }
 
   @Get('zone/:zoneId')
-  findByZone(@Param('zoneId') zoneId: number) {
-    return this.gameService.findByZone(+zoneId);
+  findByZone(@Param('zoneId', ParseIntPipe) zoneId: number) {
+    return this.gameService.findByZone(zoneId);
   }
 
   @UseGuards(AdminJwtAuthGuard)

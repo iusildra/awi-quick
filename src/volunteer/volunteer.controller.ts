@@ -5,6 +5,7 @@ import {
   Delete,
   Get,
   Param,
+  ParseIntPipe,
   Post,
   Put,
   UseGuards,
@@ -19,6 +20,7 @@ import {
 import { VolunteerService } from './volunteer.service';
 import { ApiTags } from '@nestjs/swagger';
 import { AdminJwtAuthGuard } from 'src/auth/admin-jwt-auth.gard';
+import { Logger } from '@nestjs/common';
 
 @ApiTags('volunteer')
 @Controller('volunteer')
@@ -37,43 +39,37 @@ export class VolunteerController {
   }
 
   @Get('zone/:zoneId')
-  findWithTimeslotByZone(@Param('zoneId') zoneId: number) {
-    return this.volunteerService.findWithTimeslotByZone(+zoneId);
+  findWithTimeslotByZone(@Param('zoneId', ParseIntPipe) zoneId: number) {
+    return this.volunteerService.findWithTimeslotByZone(zoneId);
   }
 
   // TODO: maybe add a route to find volunteers by "global" zone
 
   @Get('timeslot/:timeslotId')
-  findWithZoneByTimeslot(@Param('timeslotId') timeslotId: number) {
-    return this.volunteerService.findWithZoneByTimeslot(+timeslotId);
+  findWithZoneByTimeslot(
+    @Param('timeslotId', ParseIntPipe) timeslotId: number,
+  ) {
+    return this.volunteerService.findWithZoneByTimeslot(timeslotId);
   }
-
-  // @UseGuards(AdminJwtAuthGuard)
-  // @Post()
-  // create(@Body(new ValidationPipe()) data: SignupDto) {
-  //   return this.volunteerService.create(data);
-  // }
 
   @UseGuards(AdminJwtAuthGuard)
   @Post(':id/assign/:tableId')
   async assign(
     @Param('id') id: string,
-    @Param('tableId') tableId: number,
+    @Param('tableId', ParseIntPipe) tableId: number,
     @Body(new ValidationPipe()) data: AssignVolunteerDto,
   ) {
-    const currentAssignments = this.volunteerService.getExistingAssignments(id);
-
-    const newAssignments = await Promise.all(
-      data.timeslotIds.filter(
-        async (x) =>
-          !(await currentAssignments).map((a) => a.timeslot_id).includes(x),
-      ),
-    );
-    return this.volunteerService.registerAssignments(
-      id,
-      tableId,
-      newAssignments,
-    );
+    Logger.debug(typeof tableId);
+    return this.volunteerService
+      .getExistingAssignments(id)
+      .then((currents) =>
+        data.timeslotIds.filter(
+          (x) => !currents.some((a) => a.timeslot_id == x),
+        ),
+      )
+      .then((newAssignments) => {
+        this.volunteerService.registerAssignments(id, tableId, newAssignments);
+      });
   }
 
   // TODO (PATCH :id) to add/remove admins
@@ -105,7 +101,7 @@ export class VolunteerController {
   @Delete(':id/unassign/:tableId')
   unassign(
     @Param('id') id: string,
-    @Param('tableId') tableId: number,
+    @Param('tableId', ParseIntPipe) tableId: number,
     @Body(new ValidationPipe()) data: UnassignVolunteerDto,
   ) {
     return this.volunteerService.unregisterAssignments(id, tableId, data);

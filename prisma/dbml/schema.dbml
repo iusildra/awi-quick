@@ -94,9 +94,9 @@ Enum enum_weekday {
   Sunday
 }
 
-Ref: zone_room.zone_id > zone.id
+Ref: zone_room.zone_id > zone.id [delete: Cascade]
 
-Ref: room_table.room_id > zone_room.id
+Ref: room_table.room_id > zone_room.id [delete: Cascade]
 
 Ref: game_assignment.game_id > game.id [delete: Cascade]
 

@@ -22,7 +22,19 @@ export class ZoneService {
   }
 
   findOne(id: number) {
-    return this.prisma.zone.findFirst({ where: { id } });
+    return this.prisma.zone.findFirst({
+      where: { id },
+      select: {
+        name: true,
+        rooms: {
+          select: {
+            id: true,
+            name: true,
+            tables: { select: { id: true, number: true } },
+          },
+        },
+      },
+    });
   }
 
   create(createZoneDto: CreateZoneDto) {
@@ -91,10 +103,10 @@ export class ZoneService {
       .then((result) => result.count);
   }
 
-  unassignGames(zoneId: number, unassignGameDto: string[]) {
+  unassignGames(zoneId: number, data: string[]) {
     return this.prisma.game_assignment.deleteMany({
       where: {
-        AND: this.zipGameWithZone(zoneId, unassignGameDto),
+        OR: this.zipGameWithZone(zoneId, data),
       },
     });
   }

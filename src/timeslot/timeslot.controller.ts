@@ -8,6 +8,7 @@ import {
   Put,
   ValidationPipe,
   UseGuards,
+  ParseIntPipe,
 } from '@nestjs/common';
 import { TimeslotService } from './timeslot.service';
 import { CreateTimeslotDto } from './dto/create-timeslot.dto';
@@ -26,8 +27,8 @@ export class TimeslotController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: number) {
-    return this.timeslotService.findOne(+id);
+  findOne(@Param('id', ParseIntPipe) id: number) {
+    return this.timeslotService.findOne(id);
   }
 
   @UseGuards(AdminJwtAuthGuard)
@@ -39,15 +40,15 @@ export class TimeslotController {
   @UseGuards(AdminJwtAuthGuard)
   @Put(':id/')
   update(
-    @Param('id') id: number,
+    @Param('id', ParseIntPipe) id: number,
     @Body(new ValidationPipe()) updateTimeslotDto: UpdateTimeslotDto,
   ) {
-    return this.timeslotService.update(+id, updateTimeslotDto);
+    return this.timeslotService.update(id, updateTimeslotDto);
   }
 
   @UseGuards(AdminJwtAuthGuard)
   @Delete(':id')
-  remove(@Param('id') id: number) {
-    return this.timeslotService.remove(+id);
+  remove(@Param('id', ParseIntPipe) id: number) {
+    return this.timeslotService.remove(id);
   }
 }

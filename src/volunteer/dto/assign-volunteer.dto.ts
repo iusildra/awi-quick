@@ -1,4 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { Transform } from 'class-transformer';
 import { IsArray } from 'class-validator';
 
 export class AssignVolunteerDto {
@@ -12,5 +13,6 @@ export class AssignVolunteerDto {
     },
   })
   @IsArray()
+  @Transform(({ value }) => value.map((v: string) => +v))
   timeslotIds: number[];
 }
