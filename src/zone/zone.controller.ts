@@ -79,12 +79,19 @@ export class ZoneController {
   }
 
   @UseGuards(AdminJwtAuthGuard)
-  @Patch(':id')
+  @Patch()
   update(
-    @Param('id', ParseIntPipe) id: number,
-    @Body(new ValidationPipe()) updateZoneDto: UpdateZoneDto,
+    @Body(new ValidationPipe({ forbidUnknownValues: false }))
+    updateZoneDto: UpdateZoneDto,
   ) {
-    return this.zoneService.update(id, updateZoneDto);
+    const zones =
+      updateZoneDto.zoneUpdates.length > 0 &&
+      this.zoneService.updateZones(updateZoneDto.zoneUpdates);
+    const rooms =
+      updateZoneDto.roomUpdates.length > 0 &&
+      this.zoneService.updateRooms(updateZoneDto.roomUpdates);
+
+    return Promise.all([zones, rooms]);
   }
 
   @UseGuards(AdminJwtAuthGuard)
@@ -100,5 +107,17 @@ export class ZoneController {
     @Body(new ValidationPipe()) assignGameDto: UnassignGameDto,
   ) {
     return this.zoneService.unassignGames(id, assignGameDto.ids);
+  }
+
+  @UseGuards(AdminJwtAuthGuard)
+  @Delete('room/:id')
+  removeRoom(@Param('id', ParseIntPipe) id: number) {
+    return this.zoneService.removeRoom(id);
+  }
+
+  @UseGuards(AdminJwtAuthGuard)
+  @Delete('table/:id')
+  removeTable(@Param('id', ParseIntPipe) id: number) {
+    return this.zoneService.removeTable(id);
   }
 }
