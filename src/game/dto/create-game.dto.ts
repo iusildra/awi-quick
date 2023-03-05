@@ -1,6 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsEnum, IsString } from 'class-validator';
-import { responses } from '../../responses';
 
 export enum GameType {
   CHILD = 'child',

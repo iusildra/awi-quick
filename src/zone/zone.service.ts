@@ -9,16 +9,17 @@ export class ZoneService {
   constructor(private prisma: PrismaService) {}
 
   findAll() {
-    return this.prisma.zone.findMany().then((zones) =>
-      zones.reduce((obj, item) => {
-        const key = item.name;
-        if (obj[key] === undefined) {
-          obj[key] = [];
-        }
-        obj[key].push(item);
-        return obj;
-      }, {}),
-    );
+    return this.prisma.zone.findMany({
+      include: {
+        rooms: {
+          select: {
+            id: true,
+            name: true,
+            tables: { select: { id: true, number: true } },
+          },
+        },
+      },
+    });
   }
 
   findOne(id: number) {
