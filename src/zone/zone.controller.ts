@@ -34,6 +34,11 @@ export class ZoneController {
     return this.zoneService.findAll();
   }
 
+  @Get('room')
+  findAllRooms() {
+    return this.zoneService.findAllRooms();
+  }
+
   @Get(':id')
   async findOne(@Param('id', ParseIntPipe) id: number) {
     const zone = await this.zoneService.findOne(id);
@@ -63,16 +68,16 @@ export class ZoneController {
   }
 
   @UseGuards(AdminJwtAuthGuard)
-  @Post('table/:id/assign')
+  @Post('room/:id/assign')
   assignGames(
     @Param('id', ParseIntPipe) id: number,
     @Body(new ValidationPipe()) assignGameDto: AssignGameDto,
   ) {
-    return this.gameService.findByTable(id).then((games) =>
+    return this.gameService.findByRoom(id).then((games) =>
       this.zoneService.assignGames(
         id,
         assignGameDto.ids.filter(
-          (gameId) => !games.some((res) => res.game.id == gameId),
+          (gameId) => !games.some((res) => res.id == gameId),
         ),
       ),
     );
@@ -101,7 +106,7 @@ export class ZoneController {
   }
 
   @UseGuards(AdminJwtAuthGuard)
-  @Delete('table/:id/unassign')
+  @Delete('room/:id/unassign')
   unassignGames(
     @Param('id', ParseIntPipe) id: number,
     @Body(new ValidationPipe()) assignGameDto: UnassignGameDto,

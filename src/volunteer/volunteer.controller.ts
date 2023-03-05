@@ -53,13 +53,12 @@ export class VolunteerController {
   }
 
   @UseGuards(AdminJwtAuthGuard)
-  @Post(':id/assign/:tableId')
+  @Post(':id/assign/:roomId')
   async assign(
     @Param('id') id: string,
-    @Param('tableId', ParseIntPipe) tableId: number,
+    @Param('roomId', ParseIntPipe) roomId: number,
     @Body(new ValidationPipe()) data: AssignVolunteerDto,
   ) {
-    Logger.debug(typeof tableId);
     return this.volunteerService
       .getExistingAssignments(id)
       .then((currents) =>
@@ -68,7 +67,7 @@ export class VolunteerController {
         ),
       )
       .then((newAssignments) => {
-        this.volunteerService.registerAssignments(id, tableId, newAssignments);
+        this.volunteerService.registerAssignments(id, roomId, newAssignments);
       });
   }
 
@@ -101,12 +100,12 @@ export class VolunteerController {
   }
 
   @UseGuards(AdminJwtAuthGuard)
-  @Delete(':id/unassign/:tableId')
+  @Delete(':id/unassign/:roomId')
   unassign(
     @Param('id') id: string,
-    @Param('tableId', ParseIntPipe) tableId: number,
+    @Param('roomId', ParseIntPipe) roomId: number,
     @Body(new ValidationPipe()) data: UnassignVolunteerDto,
   ) {
-    return this.volunteerService.unregisterAssignments(id, tableId, data);
+    return this.volunteerService.unregisterAssignments(id, roomId, data);
   }
 }

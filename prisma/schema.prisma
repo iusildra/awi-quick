@@ -63,38 +63,38 @@ model zone {
 }
 
 model zone_room {
-  id      Int          @id @default(autoincrement())
-  name    String       @db.VarChar(255)
-  zone_id Int
-  zone    zone         @relation(fields: [zone_id], references: [id], onDelete: Cascade)
-  tables  room_table[]
+  id                    Int                     @id @default(autoincrement())
+  name                  String                  @db.VarChar(255)
+  zone_id               Int
+  zone                  zone                    @relation(fields: [zone_id], references: [id], onDelete: Cascade)
+  tables                room_table[]
+  volunteer_assignments volunteer_assignments[]
+  game_assignments      game_assignment[]
 }
 
 model room_table {
-  id          Int                     @id @default(autoincrement())
-  number      Int
-  room_id     Int
-  room        zone_room               @relation(fields: [room_id], references: [id], onDelete: Cascade)
-  games       game_assignment[]
-  assignments volunteer_assignments[]
+  id      Int       @id @default(autoincrement())
+  number  Int
+  room_id Int
+  room    zone_room @relation(fields: [room_id], references: [id], onDelete: Cascade)
 }
 
 model game_assignment {
-  table_id Int
-  game_id  String     @db.Uuid
-  game     game       @relation(fields: [game_id], references: [id], onDelete: Cascade)
-  table    room_table @relation(fields: [table_id], references: [id])
+  room_id Int
+  game_id String    @db.Uuid
+  game    game      @relation(fields: [game_id], references: [id], onDelete: Cascade)
+  room    zone_room @relation(fields: [room_id], references: [id])
 
-  @@id([table_id, game_id])
+  @@id([room_id, game_id])
 }
 
 model volunteer_assignments {
-  volunteer_id String     @db.Uuid
-  table_id     Int
+  volunteer_id String    @db.Uuid
+  room_id      Int
   timeslot_id  Int
-  timeslot     timeslot   @relation(fields: [timeslot_id], references: [id], onDelete: Cascade)
-  volunteer    volunteer  @relation(fields: [volunteer_id], references: [id], onDelete: Cascade)
-  table        room_table @relation(fields: [table_id], references: [id])
+  timeslot     timeslot  @relation(fields: [timeslot_id], references: [id], onDelete: Cascade)
+  volunteer    volunteer @relation(fields: [volunteer_id], references: [id], onDelete: Cascade)
+  room         zone_room @relation(fields: [room_id], references: [id])
 
-  @@id([volunteer_id, table_id, timeslot_id])
+  @@id([volunteer_id, room_id, timeslot_id])
 }

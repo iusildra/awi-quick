@@ -51,6 +51,11 @@ export class GameController {
     return this.gameService.findMany();
   }
 
+  @Get('zone')
+  findAllGameWithZones() {
+    return this.gameService.findAllGamesWithRooms();
+  }
+
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.gameService.findFirst(id);

@@ -41,6 +41,8 @@ Table zone_room {
   zone_id Int [not null]
   zone zone [not null]
   tables room_table [not null]
+  volunteer_assignments volunteer_assignments [not null]
+  game_assignments game_assignment [not null]
 }
 
 Table room_table {
@@ -48,31 +50,29 @@ Table room_table {
   number Int [not null]
   room_id Int [not null]
   room zone_room [not null]
-  games game_assignment [not null]
-  assignments volunteer_assignments [not null]
 }
 
 Table game_assignment {
-  table_id Int [not null]
+  room_id Int [not null]
   game_id String [not null]
   game game [not null]
-  table room_table [not null]
+  room zone_room [not null]
 
   indexes {
-    (table_id, game_id) [pk]
+    (room_id, game_id) [pk]
   }
 }
 
 Table volunteer_assignments {
   volunteer_id String [not null]
-  table_id Int [not null]
+  room_id Int [not null]
   timeslot_id Int [not null]
   timeslot timeslot [not null]
   volunteer volunteer [not null]
-  table room_table [not null]
+  room zone_room [not null]
 
   indexes {
-    (volunteer_id, table_id, timeslot_id) [pk]
+    (volunteer_id, room_id, timeslot_id) [pk]
   }
 }
 
@@ -100,10 +100,10 @@ Ref: room_table.room_id > zone_room.id [delete: Cascade]
 
 Ref: game_assignment.game_id > game.id [delete: Cascade]
 
-Ref: game_assignment.table_id > room_table.id
+Ref: game_assignment.room_id > zone_room.id
 
 Ref: volunteer_assignments.timeslot_id > timeslot.id [delete: Cascade]
 
 Ref: volunteer_assignments.volunteer_id > volunteer.id [delete: Cascade]
 
-Ref: volunteer_assignments.table_id > room_table.id
+Ref: volunteer_assignments.room_id > zone_room.id

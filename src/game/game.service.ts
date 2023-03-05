@@ -27,41 +27,61 @@ export class GameService {
     return this.prisma.game.findMany({ where: { type } });
   }
 
-  findByZone(zoneId: number) {
-    return this.prisma.zone_room
+  findAllGamesWithRooms() {
+    return this.prisma.zone
       .findMany({
-        where: { zone_id: zoneId },
-        include: {
-          tables: {
-            include: {
-              games: { select: { game: true } },
+        select: {
+          id: true,
+          name: true,
+          rooms: {
+            select: {
+              id: true,
+              name: true,
+              game_assignments: {
+                select: {
+                  game: { select: { id: true, name: true, type: true } },
+                },
+              },
             },
           },
         },
       })
-      .then((rooms) =>
-        rooms.map(({ id, name, tables }) => ({
-          id,
-          name,
-          tables: tables.map(({ id, number, games }) => ({
-            id,
-            number,
-            games: games.map(({ game }) => game),
+      .then((zones) =>
+        zones.map(({ rooms, ...rest }) => ({
+          ...rest,
+          rooms: rooms.map(({ game_assignments, ...rest }) => ({
+            ...rest,
+            game_assignments: game_assignments.map(({ game }) => game),
           })),
         })),
       );
   }
 
-  async findByTable(tableId: number) {
+  findByZone(zoneId: number) {
+    return this.prisma.zone_room
+      .findMany({
+        where: { zone_id: zoneId },
+        include: {
+          game_assignments: { select: { game: true } },
+        },
+      })
+      .then((rooms) =>
+        rooms.map(({ id, name, game_assignments }) => ({
+          id,
+          name,
+          game_assignments: game_assignments.map(({ game }) => game),
+        })),
+      );
+  }
+
+  async findByRoom(tableId: number) {
     const response = await this.prisma.zone_room.findUnique({
       where: { id: tableId },
       select: {
-        tables: {
-          select: { games: { select: { game: true } } },
-        },
+        game_assignments: { select: { game: true } },
       },
     });
-    return response.tables.flatMap((table) => table.games);
+    return response.game_assignments.map(({ game }) => game);
   }
 
   update(id: string, updateGameDto: UpdateGameDto) {

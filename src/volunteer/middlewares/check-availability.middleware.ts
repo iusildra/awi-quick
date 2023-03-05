@@ -32,7 +32,7 @@ export class CheckAvailabilityMiddleware implements NestMiddleware {
 
   async use(req: Request, res: Response, next: NextFunction) {
     const volunteerId = req.params.id;
-    const tableId = Number(req.params.tableId);
+    const roomId = Number(req.params.roomId);
     const newTimeslotIds = req.body.timeslotIds;
 
     const newAssignments = await this.prisma.timeslot.findMany({
@@ -41,7 +41,7 @@ export class CheckAvailabilityMiddleware implements NestMiddleware {
 
     const currentAssignments = await this.prisma.volunteer_assignments.findMany(
       {
-        where: { volunteer_id: volunteerId, table_id: tableId },
+        where: { volunteer_id: volunteerId, room_id: roomId },
         include: { timeslot: true },
       },
     );

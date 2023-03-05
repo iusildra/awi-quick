@@ -40,6 +40,15 @@ export class ZoneService {
     });
   }
 
+  findAllRooms() {
+    return this.prisma.zone_room.findMany({
+      include: {
+        tables: true,
+        zone: { select: { name: true } },
+      },
+    });
+  }
+
   create(createZoneDto: CreateZoneDto) {
     return this.prisma.zone.create({ data: createZoneDto });
   }
@@ -92,25 +101,25 @@ export class ZoneService {
     });
   }
 
-  zipGameWithZone(table_id: number, gameIds: string[]) {
+  zipGameWithZone(room_id: number, gameIds: string[]) {
     return gameIds.map((game_id) => ({
-      table_id,
+      room_id,
       game_id,
     }));
   }
 
-  assignGames(tableId: number, gameIds: string[]) {
+  assignGames(roomId: number, gameIds: string[]) {
     return this.prisma.game_assignment
       .createMany({
-        data: this.zipGameWithZone(tableId, gameIds),
+        data: this.zipGameWithZone(roomId, gameIds),
       })
       .then((result) => result.count);
   }
 
-  unassignGames(zoneId: number, data: string[]) {
+  unassignGames(roomId: number, data: string[]) {
     return this.prisma.game_assignment.deleteMany({
       where: {
-        OR: this.zipGameWithZone(zoneId, data),
+        OR: this.zipGameWithZone(roomId, data),
       },
     });
   }

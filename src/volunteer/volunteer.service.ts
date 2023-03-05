@@ -74,30 +74,23 @@ export class VolunteerService {
         select: {
           id: true,
           name: true,
-          tables: {
-            select: {
-              id: true,
-              number: true,
-              assignments: {
-                include: {
-                  timeslot: true,
-                  volunteer: true,
-                },
-              },
+          volunteer_assignments: {
+            include: {
+              timeslot: true,
+              volunteer: true,
             },
           },
         },
       })
       .then((response) =>
-        response.map(({ tables, ...rest }) => ({
+        response.map(({ volunteer_assignments, ...rest }) => ({
           ...rest,
-          tables: tables.map(({ assignments, ...rest }) => ({
-            ...rest,
-            assignments: assignments.map(({ volunteer, timeslot }) => ({
+          volunteer_assignments: volunteer_assignments.map(
+            ({ volunteer, timeslot }) => ({
               ...this.extractInfoFromVolunteer(volunteer),
               ...this.renameIdToTimeslotId(timeslot),
-            })),
-          })),
+            }),
+          ),
         })),
       );
   }
@@ -108,28 +101,19 @@ export class VolunteerService {
         select: {
           id: true,
           name: true,
-          tables: {
-            select: {
-              id: true,
-              number: true,
-              assignments: {
-                where: { timeslot_id: id },
-                include: {
-                  volunteer: true,
-                },
-              },
+          volunteer_assignments: {
+            where: { timeslot_id: id },
+            include: {
+              volunteer: true,
             },
           },
         },
       })
       .then((response) =>
-        response.map(({ tables, ...rest }) => ({
+        response.map(({ volunteer_assignments, ...rest }) => ({
           ...rest,
-          tables: tables.map(({ assignments, ...rest }) => ({
-            ...rest,
-            assignments: assignments.map(({ volunteer }) => ({
-              ...this.extractInfoFromVolunteer(volunteer),
-            })),
+          volunteer_assignments: volunteer_assignments.map(({ volunteer }) => ({
+            ...this.extractInfoFromVolunteer(volunteer),
           })),
         })),
       );
@@ -164,7 +148,7 @@ export class VolunteerService {
 
   registerAssignments(
     volunteerId: string,
-    tableId: number,
+    roomId: number,
     timeslotIds: number[],
   ) {
     return this.getExistingAssignments(volunteerId)
@@ -176,7 +160,7 @@ export class VolunteerService {
         this.prisma.volunteer_assignments.createMany({
           data: newAssignments.map((timeslotId) => ({
             volunteer_id: volunteerId,
-            table_id: tableId,
+            room_id: roomId,
             timeslot_id: timeslotId,
           })),
         }),
@@ -186,12 +170,12 @@ export class VolunteerService {
 
   unregisterAssignments(
     id: string,
-    tableId: number,
+    roomId: number,
     timeslotIds: UnassignVolunteerDto,
   ) {
     const deleteOptions = timeslotIds.timeslotIds.map((timeslotId) => ({
       volunteer_id: id,
-      table_id: tableId,
+      room_id: roomId,
       timeslot_id: timeslotId,
     }));
     return this.prisma.volunteer_assignments.deleteMany({
