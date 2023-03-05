@@ -79,14 +79,17 @@ export class VolunteerController {
     @Param('id') id: string,
     @Body(new ValidationPipe()) data: UpdateVolunteerDto,
   ) {
-    const existingMail = await this.volunteerService.findByMail(data.email);
-    if (existingMail) throw new ConflictException('Email already in use');
+    if (data.email) {
+      const existing = await this.volunteerService.findByMail(data.email);
+      if (existing) throw new ConflictException('Email already in use');
+    }
 
-    const existingUsername = await this.volunteerService.findByUsername(
-      data.username,
-    );
-    if (existingUsername)
-      throw new ConflictException('Username already in use');
+    if (data.username) {
+      const existing = await this.volunteerService.findByUsername(
+        data.username,
+      );
+      if (existing) throw new ConflictException('Username already in use');
+    }
 
     return this.volunteerService.update(id, data);
   }
