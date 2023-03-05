@@ -1,19 +1,26 @@
 import { room_table } from './../../node_modules/.prisma/client/index.d';
-import { Injectable, Logger } from '@nestjs/common';
+import { Inject, Injectable, Logger, forwardRef } from '@nestjs/common';
 import { UpdateVolunteerDto, UnassignVolunteerDto, SignupDto } from './dto';
 import { PrismaService } from '../prisma/prisma.service';
 import { Prisma, volunteer, timeslot, zone, zone_room } from '@prisma/client';
+import { AuthService } from '../auth/auth.service';
 
 const selectVolunteer: Prisma.volunteerSelect = {
   id: true,
   username: true,
+  firstName: true,
+  lastName: true,
   email: true,
   isAdmin: true,
 };
 
 @Injectable()
 export class VolunteerService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    @Inject(forwardRef(() => AuthService))
+    private authService: AuthService,
+  ) {}
 
   // tested
   findMany() {
@@ -136,10 +143,12 @@ export class VolunteerService {
 
   // tested
   update(id: string, data: UpdateVolunteerDto) {
-    return this.prisma.volunteer.update({
-      where: { id },
-      data,
-    });
+    return this.prisma.volunteer
+      .update({
+        where: { id },
+        data,
+      })
+      .then((volunteer) => this.authService.login(volunteer));
   }
 
   // tested

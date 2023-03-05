@@ -1,14 +1,15 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable, forwardRef } from '@nestjs/common';
 import { VolunteerService } from '../volunteer/volunteer.service';
 import { SignupDto } from '../volunteer/dto/signup.dto';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 import { TokenPayloadDto } from './dto/token.dto';
-import { Prisma, volunteer } from '@prisma/client';
+import { volunteer } from '@prisma/client';
 
 @Injectable()
 export class AuthService {
   constructor(
+    @Inject(forwardRef(() => VolunteerService))
     private readonly volunteersService: VolunteerService,
     private jwtService: JwtService,
   ) {}

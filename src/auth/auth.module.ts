@@ -1,4 +1,9 @@
-import { Module, MiddlewareConsumer, RequestMethod } from '@nestjs/common';
+import {
+  Module,
+  MiddlewareConsumer,
+  RequestMethod,
+  forwardRef,
+} from '@nestjs/common';
 import { PassportModule } from '@nestjs/passport';
 import { VolunteerModule } from '../volunteer/volunteer.module';
 import { AuthController } from './auth.controller';
@@ -11,7 +16,7 @@ import { JwtStrategy } from './jwt.strategy';
 
 @Module({
   imports: [
-    VolunteerModule,
+    forwardRef(() => VolunteerModule),
     PassportModule,
     ConfigModule.forRoot({ isGlobal: true }),
     JwtModule.register({
