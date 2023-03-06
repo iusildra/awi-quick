@@ -21,7 +21,7 @@ import { AuthModule } from '../auth/auth.module';
 export class VolunteerModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
     consumer.apply(CheckAvailabilityMiddleware).forRoutes({
-      path: 'volunteer/:id/assign/:tableId',
+      path: 'volunteer/:id/assign/:roomId',
       method: RequestMethod.POST,
     });
     consumer.apply(CheckExistingMiddleware).forRoutes({

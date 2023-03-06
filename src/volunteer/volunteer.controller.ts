@@ -20,7 +20,6 @@ import {
 import { VolunteerService } from './volunteer.service';
 import { ApiTags } from '@nestjs/swagger';
 import { AdminJwtAuthGuard } from 'src/auth/admin-jwt-auth.gard';
-import { Logger } from '@nestjs/common';
 
 @ApiTags('volunteer')
 @Controller('volunteer')
@@ -36,6 +35,11 @@ export class VolunteerController {
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.volunteerService.findFirst(id);
+  }
+
+  @Get(':id/assignments')
+  findAssignments(@Param('id') id: string) {
+    return this.volunteerService.findAssignments(id);
   }
 
   @Get('zone/:zoneId')
@@ -66,9 +70,9 @@ export class VolunteerController {
           (x) => !currents.some((a) => a.timeslot_id == x),
         ),
       )
-      .then((newAssignments) => {
-        this.volunteerService.registerAssignments(id, roomId, newAssignments);
-      });
+      .then((newAssignments) =>
+        this.volunteerService.registerAssignments(id, roomId, newAssignments),
+      );
   }
 
   // TODO (PATCH :id) to add/remove admins

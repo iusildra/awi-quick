@@ -35,6 +35,30 @@ export class VolunteerService {
     });
   }
 
+  findAssignments(id: string) {
+    return this.prisma.zone_room
+      .findMany({
+        select: {
+          id: true,
+          name: true,
+          zone: true,
+          volunteer_assignments: {
+            select: { timeslot: true },
+            where: { volunteer_id: id },
+          },
+        },
+        where: { volunteer_assignments: { some: { volunteer_id: id } } },
+      })
+      .then((response) =>
+        response.map(({ volunteer_assignments, ...rest }) => ({
+          ...rest,
+          volunteer_assignments: volunteer_assignments.map(
+            ({ timeslot }) => timeslot,
+          ),
+        })),
+      );
+  }
+
   // tested
   findByMail(email: string) {
     return this.prisma.volunteer.findFirst({ where: { email } });
@@ -178,6 +202,7 @@ export class VolunteerService {
       room_id: roomId,
       timeslot_id: timeslotId,
     }));
+    Logger.debug(deleteOptions);
     return this.prisma.volunteer_assignments.deleteMany({
       where: { OR: deleteOptions },
     });
