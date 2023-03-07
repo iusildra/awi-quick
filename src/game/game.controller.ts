@@ -61,6 +61,21 @@ export class GameController {
     return this.gameService.findFirst(id);
   }
 
+  @Get(':id/play')
+  findAssignmentsByDayFor(@Param('id') id: string) {
+    return this.gameService.findAssignmentsByDay(id).then((timeslots) =>
+      timeslots.reduce((acc, timeslot) => {
+        const { weekday, rooms, ...rest } = timeslot;
+        return rooms.reduce((nestedAcc, room) => {
+          if (!nestedAcc[weekday]) nestedAcc[weekday] = {};
+          if (!nestedAcc[weekday][room]) nestedAcc[weekday][room] = [];
+          acc[weekday][room].push(rest);
+          return nestedAcc;
+        }, acc);
+      }, {}),
+    );
+  }
+
   @Get('name/:name')
   findByName(@Param('name') name: string) {
     return this.gameService.findByName(name);

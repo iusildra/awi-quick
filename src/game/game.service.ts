@@ -27,6 +27,41 @@ export class GameService {
     return this.prisma.game.findMany({ where: { type } });
   }
 
+  findAssignmentsByDay(id: string) {
+    return this.prisma.timeslot
+      .findMany({
+        select: {
+          weekday: true,
+          start: true,
+          end: true,
+          volunteers_assigned: {
+            select: {
+              room: {
+                select: {
+                  name: true,
+                  zone: { select: { name: true } },
+                },
+              },
+            },
+            distinct: ['room_id'],
+          },
+        },
+        where: {
+          volunteers_assigned: {
+            some: { room: { game_assignments: { some: { game_id: id } } } },
+          },
+        },
+      })
+      .then((timeslots) =>
+        timeslots.map(({ volunteers_assigned, ...rest }) => ({
+          ...rest,
+          rooms: volunteers_assigned.map(
+            ({ room }) => room.zone.name + ' - ' + room.name,
+          ),
+        })),
+      );
+  }
+
   findAllGamesWithRooms() {
     return this.prisma.zone
       .findMany({
