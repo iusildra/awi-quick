@@ -16,7 +16,6 @@ export class ZoneService {
           select: {
             id: true,
             name: true,
-            zone_id: true,
             tables: { select: { id: true, number: true } },
           },
         },
