@@ -19,10 +19,10 @@ export class CreateTimeslotDto {
   end: Date;
 
   @ApiProperty({
-    example: 'My awesome timeslot',
-    description: 'The name of the timeslot',
-    type: 'string',
+    example: 1,
+    description: 'The id of a festival day',
+    type: 'number',
   })
   @IsString()
-  name: string;
+  festival_day_id: number;
 }

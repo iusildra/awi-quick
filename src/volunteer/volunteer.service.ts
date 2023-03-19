@@ -1,11 +1,10 @@
-import { room_table } from './../../node_modules/.prisma/client/index.d';
 import { Inject, Injectable, Logger, forwardRef } from '@nestjs/common';
 import { UpdateVolunteerDto, UnassignVolunteerDto, SignupDto } from './dto';
 import { PrismaService } from '../prisma/prisma.service';
-import { Prisma, volunteer, timeslot, zone, zone_room } from '@prisma/client';
+import { Prisma } from '@prisma/client';
 import { AuthService } from '../auth/auth.service';
 
-const selectVolunteer: Prisma.volunteerSelect = {
+export const selectVolunteer: Prisma.volunteerSelect = {
   id: true,
   username: true,
   firstName: true,
@@ -22,134 +21,61 @@ export class VolunteerService {
     private authService: AuthService,
   ) {}
 
-  // tested
   findMany() {
     return this.prisma.volunteer.findMany({ select: selectVolunteer });
   }
 
-  // tested
-  findFirst(id: string) {
-    return this.prisma.volunteer.findFirst({
+  findUnique(id: string) {
+    return this.prisma.volunteer.findUnique({
       where: { id },
       select: selectVolunteer,
     });
   }
 
   findAssignments(id: string) {
-    return this.prisma.zone_room
+    return this.prisma.volunteer_assignments
       .findMany({
         select: {
-          id: true,
-          name: true,
-          zone: true,
-          volunteer_assignments: {
-            select: { timeslot: true },
-            where: { volunteer_id: id },
+          timeslot: true,
+          zone: {
+            include: {
+              festivals: {
+                where: { festival: { active: true } },
+                select: { festival: { select: { id: true, name: true } } },
+              },
+            },
           },
         },
-        where: { volunteer_assignments: { some: { volunteer_id: id } } },
+        where: { volunteer_id: id },
       })
       .then((response) =>
-        response.map(({ volunteer_assignments, ...rest }) => ({
-          ...rest,
-          volunteer_assignments: volunteer_assignments.map(
-            ({ timeslot }) => timeslot,
-          ),
-        })),
+        response.reduce(
+          (acc, { timeslot, zone }) => ({
+            ...acc,
+            [zone.id]: {
+              name: zone.name,
+              festivals: zone.festivals.map((f) => f.festival),
+              timeslots: [...(acc[zone.id]?.timeslots || []), timeslot.id],
+            },
+          }),
+          {},
+        ),
       );
   }
 
-  // tested
   findByMail(email: string) {
     return this.prisma.volunteer.findFirst({ where: { email } });
   }
 
-  // tested
   findByUsername(username: string) {
     return this.prisma.volunteer.findFirst({ where: { username } });
   }
 
-  private extractInfoFromVolunteer = (volunteer: volunteer) => ({
-    volunteer_id: volunteer.id,
-    username: volunteer.username,
-    email: volunteer.email,
-    isAdmin: volunteer.isAdmin,
-  });
-
-  private renameIdToTimeslotId = (timeslot: timeslot) =>
-    (({ id, ...rest }) => ({ ...rest, timeslot_id: id }))(timeslot);
-
-  private extractInfoFromTable = (
-    table: room_table & { room: zone_room & { zone: zone } },
-  ) => ({
-    table_id: table.id,
-    room_id: table.room_id,
-    room_name: table.room.name,
-    zone_id: table.room.zone_id,
-    zone_name: table.room.zone.name,
-  });
-
-  // TODO maybe reduced this method ? x))
-  // TODO and extract a common method with the following one
-  async findWithTimeslotByZone(id: number) {
-    return this.prisma.zone_room
-      .findMany({
-        where: { zone_id: id },
-        select: {
-          id: true,
-          name: true,
-          volunteer_assignments: {
-            include: {
-              timeslot: true,
-              volunteer: true,
-            },
-          },
-        },
-      })
-      .then((response) =>
-        response.map(({ volunteer_assignments, ...rest }) => ({
-          ...rest,
-          volunteer_assignments: volunteer_assignments.map(
-            ({ volunteer, timeslot }) => ({
-              ...this.extractInfoFromVolunteer(volunteer),
-              ...this.renameIdToTimeslotId(timeslot),
-            }),
-          ),
-        })),
-      );
-  }
-
-  async findWithZoneByTimeslot(id: number) {
-    return this.prisma.zone_room
-      .findMany({
-        select: {
-          id: true,
-          name: true,
-          volunteer_assignments: {
-            where: { timeslot_id: id },
-            include: {
-              volunteer: true,
-            },
-          },
-        },
-      })
-      .then((response) =>
-        response.map(({ volunteer_assignments, ...rest }) => ({
-          ...rest,
-          volunteer_assignments: volunteer_assignments.map(({ volunteer }) => ({
-            ...this.extractInfoFromVolunteer(volunteer),
-          })),
-        })),
-      );
-  }
-
-  // tested
   create(volunteerDto: SignupDto) {
     Logger.debug(`create: ${JSON.stringify(volunteerDto)}`);
     return this.prisma.volunteer.create({ data: volunteerDto });
   }
 
-  // tested
   update(id: string, data: UpdateVolunteerDto) {
     return this.prisma.volunteer
       .update({
@@ -159,7 +85,6 @@ export class VolunteerService {
       .then((volunteer) => this.authService.login(volunteer));
   }
 
-  // tested
   destroy(id: string) {
     return this.prisma.volunteer.delete({ where: { id } });
   }
@@ -172,7 +97,7 @@ export class VolunteerService {
 
   registerAssignments(
     volunteerId: string,
-    roomId: number,
+    zoneId: number,
     timeslotIds: number[],
   ) {
     return this.getExistingAssignments(volunteerId)
@@ -184,7 +109,7 @@ export class VolunteerService {
         this.prisma.volunteer_assignments.createMany({
           data: newAssignments.map((timeslotId) => ({
             volunteer_id: volunteerId,
-            room_id: roomId,
+            zone_id: zoneId,
             timeslot_id: timeslotId,
           })),
         }),
@@ -194,12 +119,12 @@ export class VolunteerService {
 
   unregisterAssignments(
     id: string,
-    roomId: number,
+    zoneId: number,
     timeslotIds: UnassignVolunteerDto,
   ) {
     const deleteOptions = timeslotIds.timeslotIds.map((timeslotId) => ({
       volunteer_id: id,
-      room_id: roomId,
+      zone_id: zoneId,
       timeslot_id: timeslotId,
     }));
     Logger.debug(deleteOptions);

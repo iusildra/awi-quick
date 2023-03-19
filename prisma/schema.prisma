@@ -11,38 +11,13 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-enum enum_game_type {
-  child
-  family
-  ambiance
-  initiate
-  expert
-}
-
-enum enum_weekday {
-  Monday
-  Tuesday
-  Wednesday
-  Thursday
-  Friday
-  Saturday
-  Sunday
-}
-
-model game {
-  id          String            @id @default(uuid()) @db.Uuid
-  name        String            @db.VarChar(255)
-  type        enum_game_type
-  assignments game_assignment[]
-}
-
 model timeslot {
   id                  Int                     @id @default(autoincrement())
-  weekday             enum_weekday            @default(Saturday)
   start               DateTime                @db.Time()
   end                 DateTime                @db.Time()
-  name                String                  @db.VarChar(255)
+  festival_day_id     Int
   volunteers_assigned volunteer_assignments[]
+  festival_day        festival_day            @relation(fields: [festival_day_id], references: [id])
 }
 
 model volunteer {
@@ -57,44 +32,49 @@ model volunteer {
 }
 
 model zone {
-  id    Int         @id @default(autoincrement())
-  name  String      @db.VarChar(255)
-  rooms zone_room[]
+  id                  Int                     @id @default(autoincrement())
+  name                String                  @db.VarChar(255)
+  volunteers_assigned volunteer_assignments[]
+  festivals           festival_zone[]
 }
 
-model zone_room {
-  id                    Int                     @id @default(autoincrement())
-  name                  String                  @db.VarChar(255)
-  zone_id               Int
-  zone                  zone                    @relation(fields: [zone_id], references: [id], onDelete: Cascade)
-  tables                room_table[]
-  volunteer_assignments volunteer_assignments[]
-  game_assignments      game_assignment[]
+model festival {
+  id            String          @id @default(uuid()) @db.Uuid
+  name          String          @db.VarChar(255)
+  year          Int
+  active        Boolean         @default(false)
+  duration      Int
+  zones         festival_zone[]
+  festival_days festival_day[]
 }
 
-model room_table {
-  id      Int       @id @default(autoincrement())
-  number  Int
-  room_id Int
-  room    zone_room @relation(fields: [room_id], references: [id], onDelete: Cascade)
+model festival_day {
+  id          Int        @id @default(autoincrement())
+  festival_id String     @db.Uuid
+  date        DateTime   @db.Date()
+  open_at     DateTime   @db.Time()
+  close_at    DateTime   @db.Time()
+  festival    festival   @relation(fields: [festival_id], references: [id], onDelete: Cascade)
+  timeslots   timeslot[]
 }
 
-model game_assignment {
-  room_id Int
-  game_id String    @db.Uuid
-  game    game      @relation(fields: [game_id], references: [id], onDelete: Cascade)
-  room    zone_room @relation(fields: [room_id], references: [id])
+model festival_zone {
+  festival_id   String   @db.Uuid
+  zone_id       Int
+  nb_volunteers Int
+  festival      festival @relation(fields: [festival_id], references: [id], onDelete: Cascade)
+  zone          zone     @relation(fields: [zone_id], references: [id], onDelete: Cascade)
 
-  @@id([room_id, game_id])
+  @@id([festival_id, zone_id])
 }
 
 model volunteer_assignments {
   volunteer_id String    @db.Uuid
-  room_id      Int
+  zone_id      Int
   timeslot_id  Int
-  timeslot     timeslot  @relation(fields: [timeslot_id], references: [id], onDelete: Cascade)
   volunteer    volunteer @relation(fields: [volunteer_id], references: [id], onDelete: Cascade)
-  room         zone_room @relation(fields: [room_id], references: [id])
+  zone         zone      @relation(fields: [zone_id], references: [id], onDelete: Cascade)
+  timeslot     timeslot  @relation(fields: [timeslot_id], references: [id], onDelete: Cascade)
 
-  @@id([volunteer_id, room_id, timeslot_id])
+  @@id([volunteer_id, zone_id, timeslot_id])
 }

@@ -34,26 +34,12 @@ export class VolunteerController {
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.volunteerService.findFirst(id);
+    return this.volunteerService.findUnique(id);
   }
 
   @Get(':id/assignments')
   findAssignments(@Param('id') id: string) {
     return this.volunteerService.findAssignments(id);
-  }
-
-  @Get('zone/:zoneId')
-  findWithTimeslotByZone(@Param('zoneId', ParseIntPipe) zoneId: number) {
-    return this.volunteerService.findWithTimeslotByZone(zoneId);
-  }
-
-  // TODO: maybe add a route to find volunteers by "global" zone
-
-  @Get('timeslot/:timeslotId')
-  findWithZoneByTimeslot(
-    @Param('timeslotId', ParseIntPipe) timeslotId: number,
-  ) {
-    return this.volunteerService.findWithZoneByTimeslot(timeslotId);
   }
 
   @UseGuards(AdminJwtAuthGuard)

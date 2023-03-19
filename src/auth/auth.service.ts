@@ -15,7 +15,7 @@ export class AuthService {
   ) {}
 
   findUserById(id: string) {
-    return this.volunteersService.findFirst(id);
+    return this.volunteersService.findUnique(id);
   }
 
   registerUser(user: SignupDto) {
@@ -32,7 +32,7 @@ export class AuthService {
   }
 
   async login(user: volunteer) {
-    return this.volunteersService.findFirst(user.id).then((volunteer) => {
+    return this.volunteersService.findUnique(user.id).then((volunteer) => {
       const payload: TokenPayloadDto = {
         username: volunteer.username,
         email: volunteer.email,

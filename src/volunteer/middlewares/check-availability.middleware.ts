@@ -1,4 +1,4 @@
-import { Injectable, NestMiddleware, Logger } from '@nestjs/common';
+import { Injectable, NestMiddleware } from '@nestjs/common';
 import { Request, Response, NextFunction } from 'express';
 import { responses } from '../../responses';
 import { PrismaService } from '../../prisma/prisma.service';
@@ -8,31 +8,17 @@ import { timeslot } from '@prisma/client';
 export class CheckAvailabilityMiddleware implements NestMiddleware {
   constructor(private prisma: PrismaService) {}
 
-  // TODO: not correct for timeslot 1 and 5 (see sql file)
-  isOverlapping(current: timeslot, incoming: timeslot) {
-    Logger.debug(`checking ${current.id} and ${incoming.id}...`);
-    const different = incoming.id !== current.id;
-    const inside =
-      (incoming.start > current.start && incoming.start < current.end) ||
-      (incoming.end > current.start && incoming.end < current.end);
-
-    Logger.debug(`different: ${different}, inside: ${inside}`);
-    return different && inside;
-  }
-
   overlaps(currentTimeslots: timeslot[], newTimeslots: timeslot[]) {
     return currentTimeslots.filter((newTimeslot) =>
       newTimeslots.some(
-        (currentTimeslot) =>
-          this.isOverlapping(currentTimeslot, newTimeslot) ||
-          this.isOverlapping(newTimeslot, currentTimeslot),
+        (currentTimeslot) => currentTimeslot.id !== newTimeslot.id,
       ),
     );
   }
 
   async use(req: Request, res: Response, next: NextFunction) {
     const volunteerId = req.params.id;
-    const roomId = Number(req.params.roomId);
+    const zoneId = Number(req.params.zoneId);
     const newTimeslotIds = req.body.timeslotIds;
 
     const newAssignments = await this.prisma.timeslot.findMany({
@@ -41,7 +27,7 @@ export class CheckAvailabilityMiddleware implements NestMiddleware {
 
     const currentAssignments = await this.prisma.volunteer_assignments.findMany(
       {
-        where: { volunteer_id: volunteerId, room_id: roomId },
+        where: { volunteer_id: volunteerId, zone_id: zoneId },
         include: { timeslot: true },
       },
     );
