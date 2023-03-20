@@ -38,13 +38,13 @@ model zone {
 }
 
 model festival {
-  id                    String                  @id @default(uuid()) @db.Uuid
-  name                  String                  @db.VarChar(255)
-  year                  Int
-  active                Boolean                 @default(false)
-  duration              Int
-  festival_days         festival_day[]
-  festival_zone         festival_zone[]
+  id            String          @id @default(uuid()) @db.Uuid
+  name          String          @db.VarChar(255)
+  year          Int
+  active        Boolean         @default(false)
+  duration      Int
+  festival_days festival_day[]
+  festival_zone festival_zone[]
 }
 
 model festival_day {
@@ -69,14 +69,14 @@ model festival_zone {
 }
 
 model volunteer_assignments {
-  volunteer_id String        @db.Uuid
-  festival_id  String        @db.Uuid
-  zone_id      Int
-  timeslot_id  Int
-  volunteer    volunteer     @relation(fields: [volunteer_id], references: [id], onDelete: Cascade)
-  festival     festival_zone @relation(fields: [festival_id, zone_id], references: [festival_id, zone_id], onDelete: Cascade)
-  timeslot     timeslot      @relation(fields: [timeslot_id], references: [id], onDelete: Cascade)
-  zoneId       Int?
+  volunteer_id  String        @db.Uuid
+  festival_id   String        @db.Uuid
+  zone_id       Int
+  timeslot_id   Int
+  volunteer     volunteer     @relation(fields: [volunteer_id], references: [id], onDelete: Cascade)
+  festival_zone festival_zone @relation(fields: [festival_id, zone_id], references: [festival_id, zone_id], onDelete: Cascade)
+  timeslot      timeslot      @relation(fields: [timeslot_id], references: [id], onDelete: Cascade)
+  zoneId        Int?
 
   @@id([volunteer_id, zone_id, timeslot_id])
 }

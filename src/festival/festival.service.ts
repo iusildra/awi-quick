@@ -75,12 +75,12 @@ export class FestivalService {
   }
 
   findAllZones(id: string) {
-    return this.prisma.festival
-      .findUnique({
-        where: { id },
-        include: { zones: true },
+    return this.prisma.festival_zone
+      .findMany({
+        where: { festival_id: id },
+        include: { zone: true },
       })
-      .then((festival) => festival.zones);
+      .then((festival) => festival.map((f) => f.zone));
   }
 
   async findAllAssignments(id: string) {

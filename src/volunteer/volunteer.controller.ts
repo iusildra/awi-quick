@@ -43,10 +43,11 @@ export class VolunteerController {
   }
 
   @UseGuards(AdminJwtAuthGuard)
-  @Post(':id/assign/:roomId')
+  @Post(':id/assign/festival/:festivalId/zone/:zoneId')
   async assign(
     @Param('id') id: string,
-    @Param('roomId', ParseIntPipe) roomId: number,
+    @Param('festivalId') festivalId: string,
+    @Param('zoneId', ParseIntPipe) zoneId: number,
     @Body(new ValidationPipe()) data: AssignVolunteerDto,
   ) {
     return this.volunteerService
@@ -57,7 +58,12 @@ export class VolunteerController {
         ),
       )
       .then((newAssignments) =>
-        this.volunteerService.registerAssignments(id, roomId, newAssignments),
+        this.volunteerService.registerAssignments(
+          id,
+          festivalId,
+          zoneId,
+          newAssignments,
+        ),
       );
   }
 
@@ -90,12 +96,12 @@ export class VolunteerController {
   }
 
   @UseGuards(AdminJwtAuthGuard)
-  @Delete(':id/unassign/:roomId')
+  @Delete(':id/unassign/:zoneId')
   unassign(
     @Param('id') id: string,
-    @Param('roomId', ParseIntPipe) roomId: number,
+    @Param('zoneId', ParseIntPipe) zoneId: number,
     @Body(new ValidationPipe()) data: UnassignVolunteerDto,
   ) {
-    return this.volunteerService.unregisterAssignments(id, roomId, data);
+    return this.volunteerService.unregisterAssignments(id, zoneId, data);
   }
 }

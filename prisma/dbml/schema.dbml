@@ -67,7 +67,7 @@ Table volunteer_assignments {
   zone_id Int [not null]
   timeslot_id Int [not null]
   volunteer volunteer [not null]
-  festival festival_zone [not null]
+  festival_zone festival_zone [not null]
   timeslot timeslot [not null]
   zoneId Int
 

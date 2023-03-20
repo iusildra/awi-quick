@@ -33,34 +33,23 @@ export class VolunteerService {
   }
 
   findAssignments(id: string) {
-    return this.prisma.volunteer_assignments
-      .findMany({
-        select: {
-          timeslot: true,
-          zone: {
-            include: {
-              festivals: {
-                where: { festival: { active: true } },
-                select: { festival: { select: { id: true, name: true } } },
-              },
-            },
+    return this.prisma.festival_zone.findMany({
+      select: {
+        nb_volunteers: true,
+        festival: {
+          select: { id: true, name: true },
+        },
+        zone: {
+          select: { id: true, name: true },
+        },
+        volunteer_assignments: {
+          select: {
+            timeslot: true,
           },
         },
-        where: { volunteer_id: id },
-      })
-      .then((response) =>
-        response.reduce(
-          (acc, { timeslot, zone }) => ({
-            ...acc,
-            [zone.id]: {
-              name: zone.name,
-              festivals: zone.festivals.map((f) => f.festival),
-              timeslots: [...(acc[zone.id]?.timeslots || []), timeslot.id],
-            },
-          }),
-          {},
-        ),
-      );
+      },
+      where: { volunteer_assignments: { every: { volunteer_id: id } } },
+    });
   }
 
   findByMail(email: string) {
@@ -97,6 +86,7 @@ export class VolunteerService {
 
   registerAssignments(
     volunteerId: string,
+    festivalId: string,
     zoneId: number,
     timeslotIds: number[],
   ) {
@@ -109,6 +99,7 @@ export class VolunteerService {
         this.prisma.volunteer_assignments.createMany({
           data: newAssignments.map((timeslotId) => ({
             volunteer_id: volunteerId,
+            festival_id: festivalId,
             zone_id: zoneId,
             timeslot_id: timeslotId,
           })),
