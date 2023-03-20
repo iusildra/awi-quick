@@ -25,7 +25,6 @@ Table volunteer {
 Table zone {
   id Int [pk, increment]
   name String [not null]
-  volunteers_assigned volunteer_assignments [not null]
   festivals festival_zone [not null]
 }
 
@@ -35,8 +34,8 @@ Table festival {
   year Int [not null]
   active Boolean [not null, default: false]
   duration Int [not null]
-  zones festival_zone [not null]
   festival_days festival_day [not null]
+  festival_zone festival_zone [not null]
 }
 
 Table festival_day {
@@ -55,6 +54,7 @@ Table festival_zone {
   nb_volunteers Int [not null]
   festival festival [not null]
   zone zone [not null]
+  volunteer_assignments volunteer_assignments [not null]
 
   indexes {
     (festival_id, zone_id) [pk]
@@ -63,11 +63,13 @@ Table festival_zone {
 
 Table volunteer_assignments {
   volunteer_id String [not null]
+  festival_id String [not null]
   zone_id Int [not null]
   timeslot_id Int [not null]
   volunteer volunteer [not null]
-  zone zone [not null]
+  festival festival_zone [not null]
   timeslot timeslot [not null]
+  zoneId Int
 
   indexes {
     (volunteer_id, zone_id, timeslot_id) [pk]
@@ -84,6 +86,6 @@ Ref: festival_zone.zone_id > zone.id [delete: Cascade]
 
 Ref: volunteer_assignments.volunteer_id > volunteer.id [delete: Cascade]
 
-Ref: volunteer_assignments.zone_id > zone.id [delete: Cascade]
+Ref: volunteer_assignments.(festival_id, zone_id) > festival_zone.(festival_id, zone_id) [delete: Cascade]
 
 Ref: volunteer_assignments.timeslot_id > timeslot.id [delete: Cascade]
