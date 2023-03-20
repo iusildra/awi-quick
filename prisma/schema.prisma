@@ -32,19 +32,22 @@ model volunteer {
 }
 
 model zone {
-  id        Int             @id @default(autoincrement())
-  name      String          @db.VarChar(255)
-  festivals festival_zone[]
+  id                    Int                     @id @default(autoincrement())
+  name                  String                  @db.VarChar(255)
+  festival_id           String                  @db.Uuid
+  nb_volunteers         Int                     @default(0)
+  festival              festival                @relation(fields: [festival_id], references: [id])
+  volunteer_assignments volunteer_assignments[]
 }
 
 model festival {
-  id            String          @id @default(uuid()) @db.Uuid
-  name          String          @db.VarChar(255)
+  id            String         @id @default(uuid()) @db.Uuid
+  name          String         @db.VarChar(255)
   year          Int
-  active        Boolean         @default(false)
+  active        Boolean        @default(false)
   duration      Int
   festival_days festival_day[]
-  festival_zone festival_zone[]
+  zone          zone[]
 }
 
 model festival_day {
@@ -57,26 +60,13 @@ model festival_day {
   timeslots   timeslot[]
 }
 
-model festival_zone {
-  festival_id           String                  @db.Uuid
-  zone_id               Int
-  nb_volunteers         Int
-  festival              festival                @relation(fields: [festival_id], references: [id], onDelete: Cascade)
-  zone                  zone                    @relation(fields: [zone_id], references: [id], onDelete: Cascade)
-  volunteer_assignments volunteer_assignments[]
-
-  @@id([festival_id, zone_id])
-}
-
 model volunteer_assignments {
-  volunteer_id  String        @db.Uuid
-  festival_id   String        @db.Uuid
-  zone_id       Int
-  timeslot_id   Int
-  volunteer     volunteer     @relation(fields: [volunteer_id], references: [id], onDelete: Cascade)
-  festival_zone festival_zone @relation(fields: [festival_id, zone_id], references: [festival_id, zone_id], onDelete: Cascade)
-  timeslot      timeslot      @relation(fields: [timeslot_id], references: [id], onDelete: Cascade)
-  zoneId        Int?
+  volunteer_id String    @db.Uuid
+  zone_id      Int
+  timeslot_id  Int
+  volunteer    volunteer @relation(fields: [volunteer_id], references: [id], onDelete: Cascade)
+  zone         zone      @relation(fields: [zone_id], references: [id], onDelete: Cascade)
+  timeslot     timeslot  @relation(fields: [timeslot_id], references: [id], onDelete: Cascade)
 
   @@id([volunteer_id, zone_id, timeslot_id])
 }

@@ -9,21 +9,7 @@ export class ZoneService {
 
   create(createZoneDto: CreateZoneDto) {
     Logger.log(`Creating zone: ${JSON.stringify(createZoneDto)}`);
-    return this.prisma.zone
-      .create({
-        data: {
-          name: createZoneDto.name,
-        },
-      })
-      .then((zone) =>
-        this.prisma.festival_zone.create({
-          data: {
-            festival_id: createZoneDto.festival_id,
-            zone_id: zone.id,
-            nb_volunteers: createZoneDto.nb_volunteers,
-          },
-        }),
-      );
+    return this.prisma.zone.create({ data: createZoneDto });
   }
 
   findAll() {

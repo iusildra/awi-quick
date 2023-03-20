@@ -33,23 +33,22 @@ export class VolunteerService {
   }
 
   findAssignments(id: string) {
-    return this.prisma.festival_zone.findMany({
-      select: {
-        nb_volunteers: true,
-        festival: {
-          select: { id: true, name: true },
-        },
-        zone: {
-          select: { id: true, name: true },
-        },
-        volunteer_assignments: {
-          select: {
-            timeslot: true,
-          },
-        },
-      },
-      where: { volunteer_assignments: { every: { volunteer_id: id } } },
-    });
+    return this.prisma.volunteer_assignments
+      .findMany({
+        select: { zone: true, timeslot: true },
+        where: { volunteer_id: id },
+      })
+      .then((assignments) =>
+        assignments.reduce((acc, a) => {
+          const { zone, timeslot } = a;
+          const { id, ...rest } = zone;
+          acc[id] = {
+            ...rest,
+            timeslots: [...(acc[id]?.timeslots || []), timeslot],
+          };
+          return acc;
+        }, {}),
+      );
   }
 
   findByMail(email: string) {

@@ -28,14 +28,11 @@ INSERT INTO volunteer
 
 UPDATE volunteer SET "isAdmin" = true WHERE id = 'f5b5c5e1-5e86-4b92-8167-5a297ad74b27';
 
-INSERT INTO zone (name)
+INSERT INTO zone (name, festival_id, nb_volunteers)
   VALUES
-  ('Esplanade'),
-  ('Antigone');
-
-INSERT INTO festival_zone VALUES
-  ('a59ab81c-57de-42a9-9b4f-c7f107a42de1', 1, 5), ('a59ab81c-57de-42a9-9b4f-c7f107a42de1', 2, 8), ('b70bc92d-57de-42a9-9b4f-c7f107a42de1', 1, 3), ('b70bc92d-57de-42a9-9b4f-c7f107a42de1', 2, 9);
+  ('Esplanade', 'a59ab81c-57de-42a9-9b4f-c7f107a42de1', 8),
+  ('Antigone', 'b70bc92d-57de-42a9-9b4f-c7f107a42de1', 4);
 
 INSERT INTO volunteer_assignments
-  VALUES ('4dc19446-b660-4096-9cd9-ecd50083fe8f', 1, 1, 'a59ab81c-57de-42a9-9b4f-c7f107a42de1'), ('4dc19446-b660-4096-9cd9-ecd50083fe8f', 2, 2, 'a59ab81c-57de-42a9-9b4f-c7f107a42de1'), ('0055d8f1-a902-4e41-b446-1f501f4266d7', 1, 1, 'b70bc92d-57de-42a9-9b4f-c7f107a42de1'), ('0055d8f1-a902-4e41-b446-1f501f4266d7', 2, 2, 'b70bc92d-57de-42a9-9b4f-c7f107a42de1'),('ef34f441-5e86-4b92-8167-5a297ad74b27', 1, 2, 'b70bc92d-57de-42a9-9b4f-c7f107a42de1'), ('ef34f441-5e86-4b92-8167-5a297ad74b27', 2, 2, 'b70bc92d-57de-42a9-9b4f-c7f107a42de1');
+  VALUES ('4dc19446-b660-4096-9cd9-ecd50083fe8f', 1, 1), ('4dc19446-b660-4096-9cd9-ecd50083fe8f', 2, 2), ('0055d8f1-a902-4e41-b446-1f501f4266d7', 1, 1), ('0055d8f1-a902-4e41-b446-1f501f4266d7', 2, 2),('ef34f441-5e86-4b92-8167-5a297ad74b27', 1, 2), ('ef34f441-5e86-4b92-8167-5a297ad74b27', 2, 2);
 
