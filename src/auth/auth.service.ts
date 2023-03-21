@@ -36,6 +36,8 @@ export class AuthService {
       const payload: TokenPayloadDto = {
         username: volunteer.username,
         email: volunteer.email,
+        firstName: volunteer.firstName,
+        lastName: volunteer.lastName,
         sub: volunteer.id,
         isAdmin: volunteer.isAdmin,
       };

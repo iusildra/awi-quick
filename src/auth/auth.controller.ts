@@ -6,7 +6,6 @@ import {
   UsePipes,
   ValidationPipe,
   UseGuards,
-  Get,
   Logger,
 } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
@@ -37,7 +36,7 @@ export class AuthController {
   }
 
   @UseGuards(LocalAuthGuard)
-  @Get('signin')
+  @Post('signin')
   login(@Request() req: any) {
     Logger.log(`User ${req.user.username} logged in`);
     return this.authService.login(req.user);

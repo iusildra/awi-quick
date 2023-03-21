@@ -10,6 +10,14 @@ export class TokenPayloadDto {
   @IsEmail()
   email: string;
 
+  @ApiProperty({ example: 'John', type: 'string' })
+  @IsString()
+  firstName: string;
+
+  @ApiProperty({ example: 'Doe', type: 'string' })
+  @IsString()
+  lastName: string;
+
   @ApiProperty({
     example: 'b2b9c7c0-5c6a-4b6e-8c1b-8c7b8c7b8c7b',
     type: 'uuid',
