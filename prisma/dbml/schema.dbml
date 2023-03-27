@@ -38,7 +38,7 @@ Table festival {
   active Boolean [not null, default: false]
   duration Int [not null]
   festival_days festival_day [not null]
-  zone zone [not null]
+  zones zone [not null]
 }
 
 Table festival_day {

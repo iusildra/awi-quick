@@ -47,7 +47,7 @@ model festival {
   active        Boolean        @default(false)
   duration      Int
   festival_days festival_day[]
-  zone          zone[]
+  zones         zone[]
 }
 
 model festival_day {

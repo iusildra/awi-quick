@@ -43,7 +43,9 @@ export class FestivalService {
   }
 
   findAll() {
-    return this.prisma.festival.findMany();
+    return this.prisma.festival.findMany({
+      include: { festival_days: true, zones: true },
+    });
   }
 
   findAllActive() {
