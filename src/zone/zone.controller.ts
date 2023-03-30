@@ -41,7 +41,7 @@ export class ZoneController {
   @Patch(':id')
   update(
     @Param('id', ParseIntPipe) id: number,
-    @Body(new ValidationPipe())
+    @Body()
     updateZoneDto: UpdateZoneDto,
   ) {
     return this.zoneService.update(id, updateZoneDto);
