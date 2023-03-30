@@ -1,8 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { CreateFestivalDto } from './dto/create-festival.dto';
 import { UpdateFestivalDto } from './dto/update-festival.dto';
 import { PrismaService } from '../prisma/prisma.service';
-import { AddFestivalDayDto } from './dto/add-days.dto';
+import { AddFestivalDay, AddFestivalDayDto } from './dto/add-days.dto';
 import { AddFestivalTimeslotsDto } from './dto/add-timeslots.dto';
 import { RemoveFestivalDaysDto } from './dto/remove-days.dto';
 
@@ -10,36 +10,47 @@ import { RemoveFestivalDaysDto } from './dto/remove-days.dto';
 export class FestivalService {
   constructor(private prisma: PrismaService) {}
 
+  private daysDtoToModel = (festivalId: string, day: AddFestivalDay) => {
+    const date = new Date(day.date);
+    const open_at = new Date(day.date);
+    const close_at = new Date(day.date);
+    const [open_hour, open_minute, open_sec] = day.open_at.split(':');
+    const [close_hour, close_minute, close_sec] = day.close_at.split(':');
+    open_at.setHours(+open_hour, +open_minute, +open_sec);
+    close_at.setHours(+close_hour, +close_minute, +close_sec);
+    return {
+      festival_id: festivalId,
+      date: date,
+      open_at: open_at,
+      close_at: close_at,
+    };
+  };
+
   async create(createFestivalDto: CreateFestivalDto) {
     const { festival_days, ...festival_dto } = createFestivalDto;
-    const festival = await this.prisma.festival.create({
-      data: festival_dto,
-    });
-
-    return festival_days.map(
-      async (festival_day) =>
-        await this.prisma.festival_day.create({
-          data: { festival_id: festival.id, ...festival_day },
-        }),
-    );
+    return this.prisma.festival
+      .create({
+        data: festival_dto,
+      })
+      .then((festival) =>
+        festival_days.map((day) => this.daysDtoToModel(festival.id, day)),
+      )
+      .then((days) => this.prisma.festival_day.createMany({ data: days }));
   }
 
   addDays(id: string, festivalDays: AddFestivalDayDto) {
-    return festivalDays.days.map(
-      async (festivalDay) =>
-        await this.prisma.festival_day.create({
-          data: { festival_id: id, ...festivalDay },
-        }),
-    );
+    return this.prisma.festival_day.createMany({
+      data: festivalDays.days.map((day) => this.daysDtoToModel(id, day)),
+    });
   }
 
   createTimeslots(id: number, festivalTimeslots: AddFestivalTimeslotsDto) {
-    return festivalTimeslots.timeslots.map(
-      async (festivalTimeslot) =>
-        await this.prisma.timeslot.create({
-          data: { festival_day_id: id, ...festivalTimeslot },
-        }),
-    );
+    return this.prisma.timeslot.createMany({
+      data: festivalTimeslots.timeslots.map((timeslot) => ({
+        festival_day_id: id,
+        ...timeslot,
+      })),
+    });
   }
 
   findAll() {

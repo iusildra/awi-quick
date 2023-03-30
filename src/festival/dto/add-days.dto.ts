@@ -16,7 +16,7 @@ export class AddFestivalDay {
     type: 'time without time zone',
   })
   @IsDate()
-  open_at: Date;
+  open_at: string;
 
   @ApiProperty({
     example: '23:00:00',
@@ -24,7 +24,7 @@ export class AddFestivalDay {
     type: 'time without time zone',
   })
   @IsDate()
-  close_at: Date;
+  close_at: string;
 }
 
 export class AddFestivalDayDto {
