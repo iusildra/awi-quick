@@ -1,4 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { IsNumber } from 'class-validator';
 
 export class UpdateZoneDto {
   @ApiProperty({
@@ -6,4 +7,11 @@ export class UpdateZoneDto {
     type: 'string',
   })
   name: string;
+
+  @ApiProperty({
+    example: 5,
+    type: 'number',
+  })
+  @IsNumber()
+  nb_volunteers: number;
 }

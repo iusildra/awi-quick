@@ -21,7 +21,7 @@ export class ZoneService {
   }
 
   update(id: number, newZone: UpdateZoneDto) {
-    Logger.log(`Updating zone: ${JSON.stringify(newZone)}`);
+    Logger.log(`Updating zone ${id}: ${JSON.stringify(newZone)}`);
     return this.prisma.zone.update({
       where: { id },
       data: newZone,
