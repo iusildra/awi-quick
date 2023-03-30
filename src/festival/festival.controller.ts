@@ -8,12 +8,15 @@ import {
   Delete,
   ValidationPipe,
   ParseIntPipe,
+  UseGuards,
 } from '@nestjs/common';
 import { FestivalService } from './festival.service';
 import { CreateFestivalDto } from './dto/create-festival.dto';
 import { UpdateFestivalDto } from './dto/update-festival.dto';
 import { AddFestivalDayDto } from './dto/add-days.dto';
 import { AddFestivalTimeslotsDto } from './dto/add-timeslots.dto';
+import { Logger } from '@nestjs/common';
+import { AdminJwtAuthGuard } from 'src/auth/admin-jwt-auth.gard';
 
 @Controller('festival')
 export class FestivalController {
@@ -72,6 +75,7 @@ export class FestivalController {
     return this.festivalService.findAllAssignments(id);
   }
 
+  @UseGuards(AdminJwtAuthGuard)
   @Patch(':id')
   update(
     @Param('id') id: string,
@@ -80,18 +84,22 @@ export class FestivalController {
     return this.festivalService.update(id, updateFestivalDto);
   }
 
+  @UseGuards(AdminJwtAuthGuard)
   @Patch(':id/activate')
   activate(@Param('id') id: string) {
     return this.festivalService.activate(id);
   }
 
+  @UseGuards(AdminJwtAuthGuard)
   @Patch(':id/deactivate')
   deactivate(@Param('id') id: string) {
     return this.festivalService.deactivate(id);
   }
 
+  @UseGuards(AdminJwtAuthGuard)
   @Delete(':id')
   remove(@Param('id') id: string) {
+    Logger.log(`Deleting festival with id: ${id}`);
     return this.festivalService.remove(id);
   }
 }

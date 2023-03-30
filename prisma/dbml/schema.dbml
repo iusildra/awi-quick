@@ -64,9 +64,9 @@ Table volunteer_assignments {
   }
 }
 
-Ref: timeslot.festival_day_id > festival_day.id
+Ref: timeslot.festival_day_id > festival_day.id [delete: Cascade]
 
-Ref: zone.festival_id > festival.id
+Ref: zone.festival_id > festival.id [delete: Cascade]
 
 Ref: festival_day.festival_id > festival.id [delete: Cascade]
 

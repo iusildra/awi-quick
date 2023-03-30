@@ -17,7 +17,7 @@ model timeslot {
   end                 DateTime                @db.Time()
   festival_day_id     Int
   volunteers_assigned volunteer_assignments[]
-  festival_day        festival_day            @relation(fields: [festival_day_id], references: [id])
+  festival_day        festival_day            @relation(fields: [festival_day_id], references: [id], onDelete: Cascade)
 }
 
 model volunteer {
@@ -36,7 +36,7 @@ model zone {
   name                  String                  @db.VarChar(255)
   festival_id           String                  @db.Uuid
   nb_volunteers         Int                     @default(0)
-  festival              festival                @relation(fields: [festival_id], references: [id])
+  festival              festival                @relation(fields: [festival_id], references: [id], onDelete: Cascade)
   volunteer_assignments volunteer_assignments[]
 }
 

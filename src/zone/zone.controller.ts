@@ -38,7 +38,7 @@ export class ZoneController {
   }
 
   @UseGuards(AdminJwtAuthGuard)
-  @Patch()
+  @Patch(':id')
   update(
     @Param('id', ParseIntPipe) id: number,
     @Body(new ValidationPipe())

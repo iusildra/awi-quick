@@ -29,7 +29,7 @@ INSERT INTO volunteer
 UPDATE volunteer SET "isAdmin" = true WHERE id = 'f5b5c5e1-5e86-4b92-8167-5a297ad74b27';
 
 INSERT INTO zone (name, festival_id, nb_volunteers)
-  VALUES
+  VALUES 
   ('Esplanade', 'a59ab81c-57de-42a9-9b4f-c7f107a42de1', 8),
   ('Antigone', 'b70bc92d-57de-42a9-9b4f-c7f107a42de1', 4);
 
